@@ -1,0 +1,97 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="EyeFi/SOAP/EyeFilm">
+  <SOAP-ENV:Body>
+    <ns1:StartSession>
+      <macaddress>001856417729</macaddress>
+      <cnonce>8cd7212215ddb00c3d7c2a52b42c4768</cnonce>
+      <transfermode>2</transfermode>
+      <transfermodetimestamp>1303396656</transfermodetimestamp>
+    </ns1:StartSession>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Body>
+    <ns1:StartSessionResponse xmlns:ns1="http://localhost/api/soap/eyefilm">
+      <credential>4a162fd6d78764c2a132c2621f3362b8</credential>
+      <snonce>562a2ed3e94264e0737492656e566ecf</snonce>
+      <transfermode>2</transfermode>
+      <transfermodetimestamp>1303396656</transfermodetimestamp>
+      <upsyncallowed>false</upsyncallowed>
+    </ns1:StartSessionResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="EyeFi/SOAP/EyeFilm">
+  <SOAP-ENV:Body>
+    <ns1:GetPhotoStatus>
+      <credential>c1f1249d003d2dfac1413b9d8bd08f27</credential>
+      <macaddress>001856417729</macaddress>
+      <filename>IMGP7665.JPG.tar</filename>
+      <filesize>3682304</filesize>
+      <filesignature>7e9adb97c9ef4b303715b61067479731</filesignature>
+      <flags>4</flags>
+    </ns1:GetPhotoStatus>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Body>
+    <ns1:GetPhotoStatusResponse xmlns:ns1="http://localhost/api/soap/eyefilm">
+      <fileid>1</fileid>
+      <offset>0</offset>
+    </ns1:GetPhotoStatusResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+SOAPENVELOPE:
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="EyeFi/SOAP/EyeFilm">
+  <SOAP-ENV:Body>
+    <ns1:UploadPhoto>
+      <fileid>1</fileid>
+      <macaddress>001856417729</macaddress>
+      <filename>IMGP7665.JPG.tar</filename>
+      <filesize>3682304</filesize>
+      <filesignature>a81d030034c203000b87000009880000</filesignature>
+      <encryption>none</encryption>
+      <flags>4</flags>
+    </ns1:UploadPhoto>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+Upload file
+Content-type: application/x-tar
+Content-disposition: form-data; name="FILENAME"; filename="IMGP7665.JPG.tar"
+Upload file
+Content-disposition: form-data; name="INTEGRITYDIGEST"
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Body>
+    <ns1:UploadPhotoResponse xmlns:ns1="http://localhost/api/soap/eyefilm">
+      <success>true</success>
+    </ns1:UploadPhotoResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="EyeFi/SOAP/EyeFilm">
+  <SOAP-ENV:Body>
+    <ns1:MarkLastPhotoInRoll>
+      <macaddress>001856417729</macaddress>
+      <mergedelta>0</mergedelta>
+    </ns1:MarkLastPhotoInRoll>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Body>
+    <ns1:MarkLastPhotoInRollResponse xmlns:ns1="http://localhost/api/soap/eyefilm" />
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
