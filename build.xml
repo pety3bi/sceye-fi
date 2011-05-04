@@ -10,6 +10,8 @@
 <project name="sceye-fi" default="default" basedir=".">
     <description>Builds, tests, and runs the project sceye-fi.</description>
     <import file="nbproject/build-impl.xml"/>
+    <property name="sceye-fi-version" value="0.10"/>
+
     <!--
 
     There exist several targets which are by default empty and which can be 
@@ -71,4 +73,21 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <target name="zip-bin" depends="jar">
+        <zip destfile="dist/sceye-fi-${sceye-fi-version}.zip">
+            <zipfileset dir="dist" prefix="sceye-fi-${sceye-fi-version}">
+                <include name="sceye-fi.jar"/>
+                <include name="lib/**"/>
+            </zipfileset>
+        </zip>
+    </target>
+
+    <target name="zip-src">
+        <zip destfile="dist/sceye-fi-${sceye-fi-version}-src.zip">
+            <zipfileset dir="." prefix="sceye-fi-${sceye-fi-version}-src"
+                    excludes="build/**,dist/**,nbproject/private/**"/>
+        </zip>
+    </target>
+
+    <target name="zip-all" depends="zip-bin,zip-src"/>
 </project>
