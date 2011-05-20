@@ -38,4 +38,4 @@ The configuration file can be passed as a command-line argument to sceye-fi; if 
  * *user-home*`/Application Data/Eye-Fi/Settings.xml`
  * *user-home*`/Library/Eye-Fi/Settings.xml`
 
-These are the files that the EyeFi Manager creates respectively on Windows, and on Mac.
+These are the files that the Eye-Fi Manager creates respectively on Windows, and on Mac.
