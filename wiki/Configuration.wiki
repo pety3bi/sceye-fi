@@ -40,4 +40,4 @@ The configuration file can be passed as a command-line argument to sceye-fi; if 
 
 These are the files that the Eye-Fi Manager creates respectively on Windows, and on Mac.
 
-The `UploadKey` is an important piece of information: it's a secret shared between an Eye-Fi card and the server that they use to authenticate one another.
+The `UploadKey` is an important piece of information: it's a secret shared between an Eye-Fi card and the server. They use it to authenticate one another.
