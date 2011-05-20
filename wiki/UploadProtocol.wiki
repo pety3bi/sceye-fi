@@ -7,3 +7,42 @@ I will summarize here my understanding of the protocol that the Eye-Fi cards are
 The protocol is based on SOAP/HTTP. The commands are sent by the Eye-Fi card as HTTP POSTs on the port 59278 of the server. The address of the server is given to the Eye-Fi card during configuration, by the Eye-Fi Manager. The path is either `/api/soap/eyefilm/v1` for plain XML (SOAP) messages, or `/api/soap/eyefilm/v1/upload` when a file is attached. In the latter case, a multipart content is sent.
 
 When the Eye-Fi card wants to send an image to the server, it first sends a _StartSession_ command, then a _GetPhotoStatus_, then an _UploadPhoto_, and finally, a _MarkLastPhotoInRoll_.
+
+==StartSession==
+
+The purpose of the _StartSession_ command is to let the Eye-Fi card and the server authenticate each other, and to negociate the transfer mode.
+
+Here is an example of a _StartSession_ message sent by an Eye-Fi card:
+
+{{{
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="EyeFi/SOAP/EyeFilm">
+  <SOAP-ENV:Body>
+    <ns1:StartSession>
+      <macaddress>001856417729</macaddress>
+      <cnonce>8cd7212215ddb00c3d7c2a52b42c4768</cnonce>
+      <transfermode>2</transfermode>
+      <transfermodetimestamp>1303396656</transfermodetimestamp>
+    </ns1:StartSession>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+}}}
+
+The server will respond to such a message with a _StartSessionResponse_:
+
+{{{
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Body>
+    <ns1:StartSessionResponse xmlns:ns1="http://localhost/api/soap/eyefilm">
+      <credential>4a162fd6d78764c2a132c2621f3362b8</credential>
+      <snonce>562a2ed3e94264e0737492656e566ecf</snonce>
+      <transfermode>2</transfermode>
+      <transfermodetimestamp>1303396656</transfermodetimestamp>
+      <upsyncallowed>false</upsyncallowed>
+    </ns1:StartSessionResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+}}}
+
+The 
