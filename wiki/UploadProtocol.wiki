@@ -1,0 +1,9 @@
+#summary Summary of the upload protocol.
+
+= Upload protocol =
+
+I will summarize here my understanding of the protocol that the Eye-Fi cards are using to upload images to the server. This information is incomplete because it was mainly obtained by reverse-engineering.
+
+The protocol is based on SOAP/HTTP. The commands are sent by the Eye-Fi card as HTTP POSTs on the port 59278 of the server. The address of the server is given to the Eye-Fi card during configuration, by the Eye-Fi Manager. The path is either `/api/soap/eyefilm/v1` for plain XML (SOAP) messages, or `/api/soap/eyefilm/v1/upload` when a file is attached. In the latter case, a multipart content is sent.
+
+When the Eye-Fi card wants to send an image to the server, it first sends a _StartSession_ command, then a _GetPhotoStatus_, then an _UploadPhoto_, and finally, a _MarkLastPhotoInRoll_.
