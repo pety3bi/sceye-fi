@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary Configuration of Eye-Fi cards
 #labels Featured
 
 = Configuration =
@@ -39,3 +39,5 @@ The configuration file can be passed as a command-line argument to sceye-fi; if 
  * *user-home*`/Library/Eye-Fi/Settings.xml`
 
 These are the files that the Eye-Fi Manager creates respectively on Windows, and on Mac.
+
+The `UploadKey` is an important piece of information: it's a secret shared between an Eye-Fi card and the server that they use to authenticate one another.
