@@ -49,7 +49,7 @@ The server will respond to such a message with a *StartSessionResponse*:
 </SOAP-ENV:Envelope>
 }}}
 
- * *credential* is an array of bytes computed by the server, and that will allow the Eye-Fi card to authenticate it.
+ * *credential* is the MD5 digest of *macaddress*, *cnonce", and the upload key. It is used by the Eye-Fi card to authenticate the server.
  * *snonce* is a random array of bytes that the server has generated, and that is used by the authentication mechanism, as we will see below.
  * *transfermode* and *transfermodetimestamp* are copied from the request.
  * I don't know what *upsyncallowed* is, Sceye-Fi always set it to `false`.
