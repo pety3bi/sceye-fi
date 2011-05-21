@@ -13,7 +13,7 @@ import org.tastefuljava.sceyefi.multipart.Part;
 import org.tastefuljava.sceyefi.multipart.ValueParser;
 import org.tastefuljava.sceyefi.tar.TarEntry;
 import org.tastefuljava.sceyefi.tar.TarReader;
-import org.tastefuljava.sceyefi.util.Hex;
+import org.tastefuljava.sceyefi.util.Bytes;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,12 +22,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -39,14 +39,17 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.tastefuljava.sceyefi.util.LogWriter;
 
 public class EyeFiServer {
+    private static final Logger LOG
+            = Logger.getLogger(EyeFiServer.class.getName());
     private static final int WORKERS = 2;
     private static final String MAIN_CONTEXT = "/api/soap/eyefilm/v1";
     public static final String UPLOAD_CONTEXT = "/api/soap/eyefilm/v1/upload";
 
-    private byte[] snonce = randomBytes(16);
-    private String snonceStr = Hex.bin2hex(snonce);
+    private byte[] snonce = Bytes.randomBytes(16);
+    private String snonceStr = Bytes.bin2hex(snonce);
     private EyeFiConf conf;
     private ExecutorService executor;
     private HttpServer httpServer;
@@ -76,6 +79,7 @@ public class EyeFiServer {
             httpServer.setExecutor(executor);
             httpServer.start();
             started = true;
+            LOG.fine("Server started");
         } finally {
             if (!started) {
                 executor.shutdownNow();
@@ -91,7 +95,7 @@ public class EyeFiServer {
     private void handleControl(HttpExchange exchange) throws IOException {
         try {
             Headers reqHeaders = exchange.getRequestHeaders();
-            printHeaders(reqHeaders);
+            logHeaders(Level.FINE, reqHeaders);
             SAXBuilder builder = new SAXBuilder();
             Document request;
             InputStream in = exchange.getRequestBody();
@@ -100,10 +104,10 @@ public class EyeFiServer {
             } finally {
                 in.close();
             }
-            writeXML(request, System.out, true);
+            logXML(Level.FINE, request);
             Document response = handleRequest(request);
             ByteArrayOutputStream bao = new ByteArrayOutputStream();
-            writeXML(response, System.out, true);
+            logXML(Level.FINE, response);
             writeXML(response, bao, false);
             bao.close();
             Headers headers = exchange.getResponseHeaders();
@@ -130,7 +134,7 @@ public class EyeFiServer {
     private void handleUpload(HttpExchange exchange) throws IOException {
         try {
             Headers reqHeaders = exchange.getRequestHeaders();
-            printHeaders(reqHeaders);
+            logHeaders(Level.FINE, reqHeaders);
             String contentType = reqHeaders.getFirst("Content-Type");
             if (!contentType.startsWith("multipart/")) {
                 throw new IOException("Multipart content required");
@@ -143,6 +147,8 @@ public class EyeFiServer {
             byte boundary[] = parms.get("boundary").getBytes(encoding);
             InputStream in = exchange.getRequestBody();
             try {
+                byte[] calculatedDigest = null;
+                String success = "false";
                 Document request = null;
                 Element req = null;
                 Multipart mp = new Multipart(in, encoding, boundary);
@@ -156,21 +162,43 @@ public class EyeFiServer {
                         if (fieldName.equals("SOAPENVELOPE")) {
                             SAXBuilder builder = new SAXBuilder();
                             request = builder.build(is);
-                            writeXML(request, System.out, true);
+                            logXML(Level.FINE, request);
                             req = SoapEnvelope.strip(request);
                         } else if (fieldName.equals("FILENAME")) {
                             if (req == null) {
                                 throw new IOException(
                                         "No SOAP envelope found for upload");
                             }
-                            uploadFile(req, cdParms, is);
+                            calculatedDigest = uploadFile(req, cdParms, is);
+                        } else if (fieldName.equals("INTEGRITYDIGEST")) {
+                            if (calculatedDigest == null) {
+                                throw new IOException(
+                                        "Cannot check integrity digest");
+                            }
+                            Reader reader = new InputStreamReader(is, encoding);
+                            BufferedReader br = new BufferedReader(reader);
+                            String s = br.readLine();
+                            byte[] digest = Bytes.hex2bin(s);
+                            if (Bytes.equals(digest, calculatedDigest)) {
+                                success = "true";
+                            } else {
+                                LOG.log(Level.SEVERE, 
+                                        "Integrity digest don''t match: "
+                                        + "actual={0}, expected={1}",
+                                        new Object[]{
+                                            Bytes.bin2hex(calculatedDigest),
+                                            s
+                                        });
+                            }
                         } else {
-                            printHeaders(part.getHeaders());
+                            LOG.log(Level.WARNING, "Unknown field name: {0}",
+                                    fieldName);
+                            logHeaders(Level.FINE, part.getHeaders());
                             Reader reader = new InputStreamReader(is, encoding);
                             BufferedReader br = new BufferedReader(reader);
                             for (String s = br.readLine(); s != null;
                                     s = br.readLine()) {
-                                System.out.println(s);
+                                LOG.fine(s);
                             }
                         }
                     } finally {
@@ -187,7 +215,7 @@ public class EyeFiServer {
             resp.addContent(new Element("success").setText("true"));
             Document response = SoapEnvelope.wrap(resp);
             ByteArrayOutputStream bao = new ByteArrayOutputStream();
-            writeXML(response, System.out, true);
+            logXML(Level.FINE, response);
             writeXML(response, bao, false);
             bao.close();
             Headers headers = exchange.getResponseHeaders();
@@ -235,13 +263,13 @@ public class EyeFiServer {
         if (card == null) {
             throw new IOException("Card not found " + macAddress);
         }
-        byte[] cnonce = Hex.hex2bin(req.getChildText("cnonce"));
+        byte[] cnonce = Bytes.hex2bin(req.getChildText("cnonce"));
         String transferModeStr = req.getChildText("transfermode");
         String timestampStr = req.getChildText("transfermodetimestamp");
 
         byte[] credential = md5(
-                Hex.hex2bin(macAddress), cnonce, card.getUploadKey());
-        String credentialStr = Hex.bin2hex(credential);
+                Bytes.hex2bin(macAddress), cnonce, card.getUploadKey());
+        String credentialStr = Bytes.bin2hex(credential);
 
         Namespace eyefiNs = Namespace.getNamespace(
                 "ns1", "http://localhost/api/soap/eyefilm");
@@ -263,8 +291,8 @@ public class EyeFiServer {
             throw new IOException("Card not found " + macAddress);
         }
         byte[] credential = md5(
-                Hex.hex2bin(macAddress), card.getUploadKey(), snonce);
-        String expectedCred = Hex.bin2hex(credential);
+                Bytes.hex2bin(macAddress), card.getUploadKey(), snonce);
+        String expectedCred = Bytes.bin2hex(credential);
         String actualCred = req.getChildText("credential");
         if (!actualCred.equals(expectedCred)) {
             throw new IOException("Invalid credential send by the card");
@@ -298,8 +326,9 @@ public class EyeFiServer {
         }
     }
 
-    private void uploadFile(Element req, Map<String,String> cdParms,
-            InputStream stream) throws IOException {
+    private byte[] uploadFile(Element req, Map<String,String> cdParms,
+            InputStream input) throws IOException {
+        ChecksumInputStream stream = new ChecksumInputStream(input);
         String macAddress = req.getChildText("macaddress");
         EyeFiCard card = conf.getCard(macAddress);
         if (card == null) {
@@ -331,6 +360,7 @@ public class EyeFiServer {
                 out.close();
             }
         }
+        return stream.checksum(card.getUploadKey());
     }
 
     private static void writeXML(Document doc, OutputStream out,
@@ -342,19 +372,28 @@ public class EyeFiServer {
         outp.output(doc, out);
     }
 
-    private static void printHeaders(Map<String,List<String>> headers) {
-        for (Map.Entry<String,List<String>> entry: headers.entrySet()) {
-            String name = entry.getKey();
-            for (String value: entry.getValue()) {
-                System.out.println(name + ": " + value);
+    private static void logXML(Level level, Document doc) throws IOException {
+        if (LOG.isLoggable(level)) {
+            Writer out = new LogWriter(LOG, level);
+            try {
+                XMLOutputter outp = new XMLOutputter();
+                outp.setFormat(Format.getPrettyFormat());
+                outp.output(doc, out);
+            } finally {
+                out.close();
             }
         }
     }
 
-    private static byte[] randomBytes(int size) {
-        byte[] result = new byte[size];
-        Random random = new Random();
-        random.nextBytes(result);
-        return result;
+    private static void logHeaders(Level level,
+            Map<String,List<String>> headers) {
+        if (LOG.isLoggable(level)) {
+            for (Map.Entry<String,List<String>> entry: headers.entrySet()) {
+                String name = entry.getKey();
+                for (String value: entry.getValue()) {
+                    LOG.log(level, "{0}: {1}", new Object[]{name, value});
+                }
+            }
+        }
     }
 }

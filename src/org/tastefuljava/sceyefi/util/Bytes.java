@@ -1,6 +1,8 @@
 package org.tastefuljava.sceyefi.util;
 
-public class Hex {
+import java.util.Random;
+
+public class Bytes {
     private static final char[] HEX_CHARS = "0123456789abcdef".toCharArray();
 
     public static byte[] hex2bin(String hex) {
@@ -31,6 +33,26 @@ public class Hex {
             chars[j++] = HEX_CHARS[b%16];
         }
         return new String(chars);
+    }
+
+    public static boolean equals(byte[] a, byte[] b) {
+        int len = a.length;
+        if (len != b.length) {
+            return false;
+        }
+        for (int i = 0; i < len; ++i) {
+            if (a[i] != b[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static byte[] randomBytes(int size) {
+        byte[] result = new byte[size];
+        Random random = new Random();
+        random.nextBytes(result);
+        return result;
     }
 
     private static int charValue(char c) {
