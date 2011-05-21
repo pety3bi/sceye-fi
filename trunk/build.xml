@@ -10,7 +10,7 @@
 <project name="sceye-fi" default="default" basedir=".">
     <description>Builds, tests, and runs the project sceye-fi.</description>
     <import file="nbproject/build-impl.xml"/>
-    <property name="sceye-fi-version" value="0.10"/>
+    <property name="sceye-fi-version" value="0.11"/>
 
     <!--
 
