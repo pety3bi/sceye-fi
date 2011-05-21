@@ -4,6 +4,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import java.io.BufferedReader;
 import org.tastefuljava.sceyefi.conf.EyeFiCard;
 import org.tastefuljava.sceyefi.conf.EyeFiConf;
 import org.tastefuljava.sceyefi.conf.Media;
@@ -18,7 +19,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.net.InetSocketAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -87,6 +90,8 @@ public class EyeFiServer {
 
     private void handleControl(HttpExchange exchange) throws IOException {
         try {
+            Headers reqHeaders = exchange.getRequestHeaders();
+            printHeaders(reqHeaders);
             SAXBuilder builder = new SAXBuilder();
             Document request;
             InputStream in = exchange.getRequestBody();
@@ -125,6 +130,7 @@ public class EyeFiServer {
     private void handleUpload(HttpExchange exchange) throws IOException {
         try {
             Headers reqHeaders = exchange.getRequestHeaders();
+            printHeaders(reqHeaders);
             String contentType = reqHeaders.getFirst("Content-Type");
             if (!contentType.startsWith("multipart/")) {
                 throw new IOException("Multipart content required");
@@ -160,6 +166,12 @@ public class EyeFiServer {
                             uploadFile(req, cdParms, is);
                         } else {
                             printHeaders(part.getHeaders());
+                            Reader reader = new InputStreamReader(is, encoding);
+                            BufferedReader br = new BufferedReader(reader);
+                            for (String s = br.readLine(); s != null;
+                                    s = br.readLine()) {
+                                System.out.println(s);
+                            }
                         }
                     } finally {
                         is.close();

@@ -1,12 +1,18 @@
-
+run:
+Host: api.eye.fi
+Content-length: 408
+Connection: Keep-Alive
+User-agent: Eye-Fi Card/4.5022
+Soapaction: "urn:StartSession"
+Accept: text/xml, application/soap
 <?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="EyeFi/SOAP/EyeFilm">
   <SOAP-ENV:Body>
     <ns1:StartSession>
       <macaddress>001856417729</macaddress>
-      <cnonce>8cd7212215ddb00c3d7c2a52b42c4768</cnonce>
+      <cnonce>8744904b7ea202439631c67186690a1e</cnonce>
       <transfermode>2</transfermode>
-      <transfermodetimestamp>1303396656</transfermodetimestamp>
+      <transfermodetimestamp>1304505230</transfermodetimestamp>
     </ns1:StartSession>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
@@ -15,24 +21,30 @@
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Body>
     <ns1:StartSessionResponse xmlns:ns1="http://localhost/api/soap/eyefilm">
-      <credential>4a162fd6d78764c2a132c2621f3362b8</credential>
-      <snonce>562a2ed3e94264e0737492656e566ecf</snonce>
+      <credential>0d400f69ce6096c3771f9465c6123145</credential>
+      <snonce>d5b2b8dd7a681cfb5320aaac2fd9bba4</snonce>
       <transfermode>2</transfermode>
-      <transfermodetimestamp>1303396656</transfermodetimestamp>
+      <transfermodetimestamp>1304505230</transfermodetimestamp>
       <upsyncallowed>false</upsyncallowed>
     </ns1:StartSessionResponse>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 
+Host: api.eye.fi
+Content-length: 477
+Connection: Keep-Alive
+User-agent: Eye-Fi Card/4.5022
+Soapaction: "urn:GetPhotoStatus"
+Accept: text/xml, application/soap
 <?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="EyeFi/SOAP/EyeFilm">
   <SOAP-ENV:Body>
     <ns1:GetPhotoStatus>
-      <credential>c1f1249d003d2dfac1413b9d8bd08f27</credential>
+      <credential>2d7b2e9f6755a1a51152a32a2d4e98a6</credential>
       <macaddress>001856417729</macaddress>
-      <filename>IMGP7665.JPG.tar</filename>
-      <filesize>3682304</filesize>
-      <filesignature>7e9adb97c9ef4b303715b61067479731</filesignature>
+      <filename>P1030007.JPG.tar</filename>
+      <filesize>1269760</filesize>
+      <filesignature>343afd9e4e84d3d4f5969cd97214f7f2</filesignature>
       <flags>4</flags>
     </ns1:GetPhotoStatus>
   </SOAP-ENV:Body>
@@ -48,27 +60,29 @@
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 
-SOAPENVELOPE:
+Content-type: multipart/form-data; boundary=---------------------------02468ace13579bdfcafebabef00d
+Host: api.eye.fi
+Content-length: 1270723
+Connection: Keep-Alive
+User-agent: Eye-Fi Card/4.5022
+Accept: text/xml, application/soap
 <?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="EyeFi/SOAP/EyeFilm">
   <SOAP-ENV:Body>
     <ns1:UploadPhoto>
       <fileid>1</fileid>
       <macaddress>001856417729</macaddress>
-      <filename>IMGP7665.JPG.tar</filename>
-      <filesize>3682304</filesize>
-      <filesignature>a81d030034c203000b87000009880000</filesignature>
+      <filename>P1030007.JPG.tar</filename>
+      <filesize>1269760</filesize>
+      <filesignature>c8340300c434030000000000dced0300</filesignature>
       <encryption>none</encryption>
       <flags>4</flags>
     </ns1:UploadPhoto>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 
-Upload file
-Content-type: application/x-tar
-Content-disposition: form-data; name="FILENAME"; filename="IMGP7665.JPG.tar"
-Upload file
-Content-disposition: form-data; name="INTEGRITYDIGEST"
+content-disposition: form-data; name="INTEGRITYDIGEST"
+feec0d23e4cd31f0ddbef48a64d097b0
 <?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Body>
@@ -78,6 +92,12 @@ Content-disposition: form-data; name="INTEGRITYDIGEST"
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 
+Host: api.eye.fi
+Content-length: 312
+Connection: Close
+User-agent: Eye-Fi Card/4.5022
+Soapaction: "urn:MarkLastPhotoInRoll"
+Accept: text/xml, application/soap
 <?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="EyeFi/SOAP/EyeFilm">
   <SOAP-ENV:Body>
@@ -94,4 +114,3 @@ Content-disposition: form-data; name="INTEGRITYDIGEST"
     <ns1:MarkLastPhotoInRollResponse xmlns:ns1="http://localhost/api/soap/eyefilm" />
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
-
