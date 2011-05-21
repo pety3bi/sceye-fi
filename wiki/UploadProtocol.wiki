@@ -6,13 +6,13 @@ I will summarize here my understanding of the protocol that the Eye-Fi cards are
 
 The protocol is based on SOAP/HTTP. The commands are sent by the Eye-Fi card as HTTP POSTs on the port 59278 of the server. The address of the server is given to the Eye-Fi card during configuration, by the Eye-Fi Manager. The path is either `/api/soap/eyefilm/v1` for plain XML (SOAP) messages, or `/api/soap/eyefilm/v1/upload` when a file is attached. In the latter case, a multipart content is sent.
 
-When the Eye-Fi card wants to send an image to the server, it first sends a _StartSession_ command, then a _GetPhotoStatus_, then an _UploadPhoto_, and finally, a _MarkLastPhotoInRoll_.
+When the Eye-Fi card wants to send an image to the server, it first sends a *StartSession* command, then a *GetPhotoStatus*, then an *UploadPhoto*, and finally, a *MarkLastPhotoInRoll*.
 
 ==StartSession==
 
-The purpose of the _StartSession_ command is to let the Eye-Fi card and the server authenticate each other, and to negociate the transfer mode.
+The purpose of the *StartSession* command is to let the Eye-Fi card and the server authenticate each other, and to negociate the transfer mode.
 
-Here is an example of a _StartSession_ message sent by an Eye-Fi card:
+Here is an example of a *StartSession* message sent by an Eye-Fi card:
 
 {{{
 <?xml version="1.0" encoding="UTF-8"?>
@@ -31,7 +31,7 @@ Here is an example of a _StartSession_ message sent by an Eye-Fi card:
  * *macaddress* identifies the Eye-Fi card. The server will search in it's registry an Eye-Fi card with that MAC address. The registry contains all the information needed to continue the dialog. The upload key for instance.
  * *cnonce* is a random array of bytes that the Eye-Fi card has generated, and that is used by the authentication mechanism, as we will see below.
 
-The server will respond to such a message with a _StartSessionResponse_:
+The server will respond to such a message with a *StartSessionResponse*:
 
 {{{
 <?xml version="1.0" encoding="UTF-8"?>
