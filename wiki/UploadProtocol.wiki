@@ -20,13 +20,16 @@ Here is an example of a _StartSession_ message sent by an Eye-Fi card:
   <SOAP-ENV:Body>
     <ns1:StartSession>
       <macaddress>001856417729</macaddress>
-      <cnonce>8cd7212215ddb00c3d7c2a52b42c4768</cnonce>
+      <cnonce>8744904b7ea202439631c67186690a1e</cnonce>
       <transfermode>2</transfermode>
-      <transfermodetimestamp>1303396656</transfermodetimestamp>
+      <transfermodetimestamp>1304505230</transfermodetimestamp>
     </ns1:StartSession>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 }}}
+
+ * *macaddress* identifies the Eye-Fi card. The server will search in it's registry an Eye-Fi card with that MAC address. The registry contains all the information needed to continue the dialog. The upload key for instance.
+ * *cnonce* is a random array of bytes that the Eye-Fi card has generated, and that is used by the authentication mechanism, as we will see below.
 
 The server will respond to such a message with a _StartSessionResponse_:
 
@@ -35,14 +38,12 @@ The server will respond to such a message with a _StartSessionResponse_:
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Body>
     <ns1:StartSessionResponse xmlns:ns1="http://localhost/api/soap/eyefilm">
-      <credential>4a162fd6d78764c2a132c2621f3362b8</credential>
-      <snonce>562a2ed3e94264e0737492656e566ecf</snonce>
+      <credential>0d400f69ce6096c3771f9465c6123145</credential>
+      <snonce>d5b2b8dd7a681cfb5320aaac2fd9bba4</snonce>
       <transfermode>2</transfermode>
-      <transfermodetimestamp>1303396656</transfermodetimestamp>
+      <transfermodetimestamp>1304505230</transfermodetimestamp>
       <upsyncallowed>false</upsyncallowed>
     </ns1:StartSessionResponse>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 }}}
-
-The 
