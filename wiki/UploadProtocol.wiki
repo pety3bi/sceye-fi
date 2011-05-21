@@ -30,6 +30,7 @@ Here is an example of a *StartSession* message sent by an Eye-Fi card:
 
  * *macaddress* identifies the Eye-Fi card. The server will search in it's registry an Eye-Fi card with that MAC address. The registry contains all the information needed to continue the dialog. The upload key for instance.
  * *cnonce* is a random array of bytes that the Eye-Fi card has generated, and that is used by the authentication mechanism, as we will see below.
+ * I don't know what *transfermode* and *transfermodetimestamp* are, Sceye-Fi simply sends back the same values to the Eye-Fi card.
 
 The server will respond to such a message with a *StartSessionResponse*:
 
@@ -47,3 +48,8 @@ The server will respond to such a message with a *StartSessionResponse*:
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 }}}
+
+ * *credential* is an array of bytes computed by the server, and that will allow the Eye-Fi card to authenticate it.
+ * *snonce* is a random array of bytes that the server has generated, and that is used by the authentication mechanism, as we will see below.
+ * *transfermode* and *transfermodetimestamp* are copied from the request.
+ * I don't know what *upsyncallowed* is, Sceye-Fi always set it to `false`.
