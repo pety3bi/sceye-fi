@@ -1,6 +1,6 @@
 package org.tastefuljava.sceyefi.conf;
 
-import org.tastefuljava.sceyefi.util.Hex;
+import org.tastefuljava.sceyefi.util.Bytes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -19,8 +19,8 @@ public class EyeFiCard {
     EyeFiCard(Element cardElm) {
         String mac = cardElm.getAttributeValue("MacAddress");
         macAddress = mac.replace("-","");
-        uploadKey = Hex.hex2bin(cardElm.getChildText("UploadKey"));
-        downsyncKey = Hex.hex2bin(cardElm.getChildText("DownsyncKey"));
+        uploadKey = Bytes.hex2bin(cardElm.getChildText("UploadKey"));
+        downsyncKey = Bytes.hex2bin(cardElm.getChildText("DownsyncKey"));
         transferMode = Integer.parseInt(cardElm.getChildText("TransferMode"));
         timestamp = Long.parseLong(
                 cardElm.getChildText("TransferModeTimestamp"));

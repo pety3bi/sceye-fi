@@ -3,7 +3,7 @@ package org.tastefuljava.sceyefi.util;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class HexTest {
+public class BytesTest {
     private static final byte[] TEST_BYTES
             = {0x01, 0x23, 0x45, 0x67,
             (byte)0x89, (byte)0xAB, (byte)0xCD, (byte)0xEF};
@@ -12,19 +12,19 @@ public class HexTest {
     @Test
     public void testHexToBin() {
         System.out.println("hexToBin");
-        assertArrayEquals(TEST_BYTES, Hex.hex2bin(TEST_HEX));
+        assertArrayEquals(TEST_BYTES, Bytes.hex2bin(TEST_HEX));
     }
 
     @Test
     public void testBin2hex() {
         System.out.println("bin2hex");
-        assertEquals(TEST_HEX, Hex.bin2hex(TEST_BYTES));
+        assertEquals(TEST_HEX, Bytes.bin2hex(TEST_BYTES));
     }
 
     @Test
     public void testBin2hex3() {
         System.out.println("bin2hex");
         assertEquals(TEST_HEX.substring(2, 2+12),
-                Hex.bin2hex(TEST_BYTES, 1, 6));
+                Bytes.bin2hex(TEST_BYTES, 1, 6));
     }
 }

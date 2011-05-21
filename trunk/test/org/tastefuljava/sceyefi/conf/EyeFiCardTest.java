@@ -1,6 +1,6 @@
 package org.tastefuljava.sceyefi.conf;
 
-import org.tastefuljava.sceyefi.util.Hex;
+import org.tastefuljava.sceyefi.util.Bytes;
 import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,14 +24,14 @@ public class EyeFiCardTest {
     @Test
     public void testUploadKey() {
         System.out.println("uploadKey");
-        assertArrayEquals(Hex.hex2bin("0d6ec517a597ec130b64e77c9b57f40e"),
+        assertArrayEquals(Bytes.hex2bin("0d6ec517a597ec130b64e77c9b57f40e"),
                 card.getUploadKey());
     }
 
     @Test
     public void testDownsyncKey() {
         System.out.println("downsyncKey");
-        assertArrayEquals(Hex.hex2bin("693db4cdaa431bb3b1132dfe89c60755"),
+        assertArrayEquals(Bytes.hex2bin("693db4cdaa431bb3b1132dfe89c60755"),
                 card.getDownsyncKey());
     }
 
