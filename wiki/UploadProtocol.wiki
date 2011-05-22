@@ -1,4 +1,5 @@
 #summary Summary of the upload protocol.
+#labels Featured
 
 = Upload protocol =
 
