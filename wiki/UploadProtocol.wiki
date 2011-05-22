@@ -148,3 +148,33 @@ The TCP checksum of a block is computed as follows:
  * the block is treated as an array of 256 16-bit unsigned integers, low-order byte first (little endian), and all these integers are added into a 32-bit sum.
  * if the 32-bit sum is greater that 65535 (2^16-1), add the high-order and low-order 16-bit words, and repeat the process while the result is greater than 65535.
  * take the complement to 1 of the result.
+
+==MarkLastPhotoInRoll==
+
+The Eye-Fi card may upload several files in parallel. When it is done, it sends a *MarkLastPhotoInRoll* command:
+
+{{{
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="EyeFi/SOAP/EyeFilm">
+  <SOAP-ENV:Body>
+    <ns1:MarkLastPhotoInRoll>
+      <macaddress>001856417729</macaddress>
+      <mergedelta>0</mergedelta>
+    </ns1:MarkLastPhotoInRoll>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+}}}
+
+ * *macaddress* as always, the MAC address of the Eye-Fi card
+ * I don't know what the *mergedelta* is.
+
+To which the server responds with a *MarkLastPhotoInRollResponse* message:
+
+{{{
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Body>
+    <ns1:MarkLastPhotoInRollResponse xmlns:ns1="http://localhost/api/soap/eyefilm" />
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+}}}
