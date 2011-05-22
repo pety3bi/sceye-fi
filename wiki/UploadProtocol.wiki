@@ -74,6 +74,14 @@ Before the Eye-Fi card starts the actual upload, it sens a *GetPhotoStatus* requ
 </SOAP-ENV:Envelope>
 }}}
 
+ * *credential* this time, it's the Eye-Fi card that is sending a credential, so that the server can authentify it. It's the MD5 digest of *macaddress*, the upload key, and the *snonce* that was sent by the server in its respond to the *StartSession* command.
+ * *macaddress* is the card's MAC address of the Eye-Fi card
+ * *filename* is the name of the file that the card wants to send. Note that it is a TAR file.
+ * *filesize* is the size of that file
+ * I don't know what the *filesignature* and the *flags* are. Sceye-Fi ignores them.
+
+The server will respond with a *GetPhotoStatusResponse* message:
+
 {{{
 <?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
@@ -85,3 +93,6 @@ Before the Eye-Fi card starts the actual upload, it sens a *GetPhotoStatus* requ
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 }}}
+
+ * *fileid* is a unique number for the file about to be send. It will be repeated by the Eye-Fi card in the forthcoming *UploadPhoto* message.
+ * I don't know what *offset* means, but I guess it's a way for the server to resume an upload that was aborted. Sceye-Fi always sends 0 though.
