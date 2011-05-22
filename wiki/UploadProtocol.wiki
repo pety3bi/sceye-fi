@@ -96,3 +96,26 @@ The server will respond with a *GetPhotoStatusResponse* message:
 
  * *fileid* is a unique number for the file about to be send. It will be repeated by the Eye-Fi card in the forthcoming *UploadPhoto* message.
  * I don't know what *offset* means, but I guess it's a way for the server to resume an upload that was aborted. Sceye-Fi is always sending a value of 0 though.
+
+==UploadPhoto==
+
+The actual file content is sent by the Eye-Fi card in a multipart POST on path `/api/soap/eyefilm/v1/upload`. The first part, named `SOAPENVELOPE` contains the SOAP envelope for the command; the second part, named `FILENAME` contains the actual file content, and the third and last part, named `INTEGRITYDIGEST` is a 16-byte hash that can be used to check the file's integrity.
+
+A soap envelope looks like this:
+
+{{{
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="EyeFi/SOAP/EyeFilm">
+  <SOAP-ENV:Body>
+    <ns1:UploadPhoto>
+      <fileid>1</fileid>
+      <macaddress>001856417729</macaddress>
+      <filename>P1030007.JPG.tar</filename>
+      <filesize>1269760</filesize>
+      <filesignature>c8340300c434030000000000dced0300</filesignature>
+      <encryption>none</encryption>
+      <flags>4</flags>
+    </ns1:UploadPhoto>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+}}}
