@@ -152,7 +152,7 @@ The TCP checksum of a block is computed as follows:
 
 ==MarkLastPhotoInRoll==
 
-The Eye-Fi card may upload several files in parallel. When it is done, it sends a *MarkLastPhotoInRoll* command:
+The Eye-Fi card may upload several files in parallel. When everything is done, it sends a *MarkLastPhotoInRoll* command:
 
 {{{
 <?xml version="1.0" encoding="UTF-8"?>
