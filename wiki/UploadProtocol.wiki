@@ -95,4 +95,4 @@ The server will respond with a *GetPhotoStatusResponse* message:
 }}}
 
  * *fileid* is a unique number for the file about to be send. It will be repeated by the Eye-Fi card in the forthcoming *UploadPhoto* message.
- * I don't know what *offset* means, but I guess it's a way for the server to resume an upload that was aborted. Sceye-Fi is always sending a 0 though.
+ * I don't know what *offset* means, but I guess it's a way for the server to resume an upload that was aborted. Sceye-Fi is always sending a value of 0 though.
