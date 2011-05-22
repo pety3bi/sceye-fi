@@ -119,3 +119,32 @@ A soap envelope looks like this:
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 }}}
+
+ * *macaddress* is the card's MAC address of the Eye-Fi card
+ * *filename* is the name of the file
+ * *filesize* is the size of that file
+ * I don't know what the *filesignature*, the *encryption* and the *flags* are, Sceye-Fi ignores them.
+
+
+The server will respond with a *UploadPhotoResponse* message:
+
+{{{
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Body>
+    <ns1:UploadPhotoResponse xmlns:ns1="http://localhost/api/soap/eyefilm">
+      <success>true</success>
+    </ns1:UploadPhotoResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+}}}
+
+===Integrity check===
+
+The third part, `INTEGRITYDIGEST` contains an hexadecimal-encoded hash code that is the MD5 digest of the TCP checksums of each 512-byte block in the file content, followed by the upload key. The file being a TAR file, it is always 512-bytes padded.
+
+The TCP checksum of a block is computed as follows:
+
+ * the block is treated as an array of 256 16-bit unsigned integers, low-order byte first (little endian), and all these integers are added into a 32-bit sum.
+ * if the 32-bit sum is greater that 65535 (2^16-1), add the high-order and low-order 16-bit words, and repeat the process while the result is greater than 65535.
+ * take the complement to 1 of the result.
