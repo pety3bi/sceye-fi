@@ -1,5 +1,4 @@
 #summary Configuration of Eye-Fi cards
-#labels Featured
 
 = Configuration =
 
