@@ -79,6 +79,9 @@
                 <include name="sceye-fi.jar"/>
                 <include name="lib/**"/>
             </zipfileset>
+            <zipfileset dir="." prefix="sceye-fi-${sceye-fi-version}">
+                <include name="LICENSE.txt"/>
+            </zipfileset>
         </zip>
     </target>
 
