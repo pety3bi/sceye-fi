@@ -6,6 +6,7 @@ import org.tastefuljava.sceyefi.server.EyeFiServer;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.tastefuljava.sceyefi.server.DiskFileHandler;
 
 public class Main {
     private static File settings = null;
@@ -22,7 +23,7 @@ public class Main {
             } else {
                 conf = EyeFiConf.load(settings);
             }
-            EyeFiServer.start(conf);
+            EyeFiServer.start(conf, new DiskFileHandler());
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
