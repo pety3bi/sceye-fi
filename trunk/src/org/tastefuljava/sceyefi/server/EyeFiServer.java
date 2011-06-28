@@ -44,6 +44,8 @@ import org.tastefuljava.sceyefi.util.LogWriter;
 public class EyeFiServer {
     private static final Logger LOG
             = Logger.getLogger(EyeFiServer.class.getName());
+
+    private static final int EYEFI_PORT = 59278;
     private static final int WORKERS = 2;
     private static final String MAIN_CONTEXT = "/api/soap/eyefilm/v1";
     public static final String UPLOAD_CONTEXT = "/api/soap/eyefilm/v1/upload";
@@ -54,14 +56,18 @@ public class EyeFiServer {
     private ExecutorService executor;
     private HttpServer httpServer;
     private int lastFileId;
+    private FileHandler fileHandler;
 
-    public static EyeFiServer start(EyeFiConf conf) throws IOException {
-        return new EyeFiServer(conf);
+    public static EyeFiServer start(EyeFiConf conf, FileHandler fileHandler)
+            throws IOException {
+        return new EyeFiServer(conf, fileHandler);
     }
 
-    private EyeFiServer(EyeFiConf conf) throws IOException {
+    private EyeFiServer(EyeFiConf conf, FileHandler fileHandler)
+            throws IOException {
         this.conf = conf;
-        InetSocketAddress addr = new InetSocketAddress(59278);
+        this.fileHandler = fileHandler;
+        InetSocketAddress addr = new InetSocketAddress(EYEFI_PORT);
         httpServer = HttpServer.create(addr, 0);
         httpServer.createContext(MAIN_CONTEXT, new HttpHandler() {
             public void handle(HttpExchange exchange) throws IOException {
@@ -334,30 +340,13 @@ public class EyeFiServer {
         if (card == null) {
             throw new IOException("Card not found " + macAddress);
         }
-        Media media = card.getMedia(Media.TYPE_PHOTO);
-        if (media == null) {
-            throw new IOException("No photo media in Eye-Fi settings");
-        }
-        File folder = media.getFolder();
-        if (!folder.isDirectory() && !folder.mkdirs()) {
-            throw new IOException("Could not create folder " + folder);
-        }
-        byte[] buf = new byte[4096];
         TarReader tr = new TarReader(stream);
         for (TarEntry te = tr.nextEntry(); te != null; te = tr.nextEntry()) {
-            File file = new File(folder, te.getFileName());
-            OutputStream out = new FileOutputStream(file);
+            InputStream in = te.getInputStream();
             try {
-                InputStream in = te.getInputStream();
-                try {
-                    for (int n = in.read(buf); n >= 0; n = in.read(buf)) {
-                        out.write(buf, 0, n);
-                    }
-                } finally {
-                    in.close();
-                }
+                fileHandler.handleFile(card, te.getFileName(), in);
             } finally {
-                out.close();
+                in.close();
             }
         }
         return stream.checksum(card.getUploadKey());
