@@ -36,6 +36,8 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.tastefuljava.sceyefi.spi.EyeFiHandler;
+import org.tastefuljava.sceyefi.spi.UploadHandler;
 import org.tastefuljava.sceyefi.util.LogWriter;
 
 public class EyeFiServer {
@@ -53,17 +55,17 @@ public class EyeFiServer {
     private ExecutorService executor;
     private HttpServer httpServer;
     private int lastFileId;
-    private FileHandler fileHandler;
+    private EyeFiHandler handler;
 
-    public static EyeFiServer start(EyeFiConf conf, FileHandler fileHandler)
+    public static EyeFiServer start(EyeFiConf conf, EyeFiHandler handler)
             throws IOException {
-        return new EyeFiServer(conf, fileHandler);
+        return new EyeFiServer(conf, handler);
     }
 
-    private EyeFiServer(EyeFiConf conf, FileHandler fileHandler)
+    private EyeFiServer(EyeFiConf conf, EyeFiHandler handler)
             throws IOException {
         this.conf = conf;
-        this.fileHandler = fileHandler;
+        this.handler = handler;
         InetSocketAddress addr = new InetSocketAddress(EYEFI_PORT);
         httpServer = HttpServer.create(addr, 0);
         httpServer.createContext(MAIN_CONTEXT, new HttpHandler() {
@@ -149,11 +151,14 @@ public class EyeFiServer {
             }
             byte boundary[] = parms.get("boundary").getBytes(encoding);
             InputStream in = exchange.getRequestBody();
+            boolean success = false;
             try {
                 byte[] calculatedDigest = null;
-                String success = "false";
+                boolean failed = false;
                 Document request = null;
                 Element req = null;
+                EyeFiCard card = null;
+                UploadHandler upload = null;
                 Multipart mp = new Multipart(in, encoding, boundary);
                 Part part = mp.nextPart();
                 while (part != null) {
@@ -167,23 +172,36 @@ public class EyeFiServer {
                             request = builder.build(is);
                             logXML(Level.FINE, request);
                             req = SoapEnvelope.strip(request);
-                        } else if (fieldName.equals("FILENAME")) {
-                            if (req == null) {
-                                throw new IOException(
-                                        "No SOAP envelope found for upload");
+                            String macAddress = req.getChildText("macaddress");
+                            if (macAddress == null) {
+                                LOG.severe("No mac address in request");
+                                failed = true;
+                            } else {
+                                card = conf.getCard(macAddress);
+                                if (card == null) {
+                                    LOG.log(Level.SEVERE, "Card not found {0}",
+                                            macAddress);
+                                    failed = true;
+                                }
+                                String arcName = req.getChildText("filename");
+                                upload = handler.startUpload(card, arcName);
                             }
-                            calculatedDigest = uploadFile(req, cdParms, is);
+                        } else if (fieldName.equals("FILENAME")) {
+                            if (upload == null) {
+                                LOG.severe("No upload handler");
+                            }
+                            calculatedDigest = uploadFile(
+                                    card, upload, cdParms, is);
                         } else if (fieldName.equals("INTEGRITYDIGEST")) {
                             if (calculatedDigest == null) {
-                                throw new IOException(
-                                        "Cannot check integrity digest");
+                                LOG.severe("No upload handler");
                             }
                             Reader reader = new InputStreamReader(is, encoding);
                             BufferedReader br = new BufferedReader(reader);
                             String s = br.readLine();
                             byte[] digest = Bytes.hex2bin(s);
                             if (Bytes.equals(digest, calculatedDigest)) {
-                                success = "true";
+                                success = !failed;
                             } else {
                                 LOG.log(Level.SEVERE, 
                                         "Integrity digest don''t match: "
@@ -192,6 +210,8 @@ public class EyeFiServer {
                                             Bytes.bin2hex(calculatedDigest),
                                             s
                                         });
+                                failed = true;
+                                success = false;
                             }
                         } else {
                             LOG.log(Level.WARNING, "Unknown field name: {0}",
@@ -209,13 +229,21 @@ public class EyeFiServer {
                     }
                     part = mp.nextPart();
                 }
+                if (upload != null) {
+                    if (success) {
+                        upload.commit();
+                    } else {
+                        upload.abort();
+                    }
+                }
             } finally {
                 in.close();
             }
             Namespace eyefiNs = Namespace.getNamespace(
                     "ns1", "http://localhost/api/soap/eyefilm");
             Element resp = new Element("UploadPhotoResponse", eyefiNs);
-            resp.addContent(new Element("success").setText("true"));
+            resp.addContent(new Element("success").setText(
+                    success ? "true" : "false"));
             Document response = SoapEnvelope.wrap(resp);
             ByteArrayOutputStream bao = new ByteArrayOutputStream();
             logXML(Level.FINE, response);
@@ -329,24 +357,21 @@ public class EyeFiServer {
         }
     }
 
-    private byte[] uploadFile(Element req, Map<String,String> cdParms,
-            InputStream input) throws IOException {
+    private byte[] uploadFile(EyeFiCard card, UploadHandler upload,
+            Map<String,String> cdParms, InputStream input) throws IOException {
         ChecksumInputStream stream = new ChecksumInputStream(input);
-        String macAddress = req.getChildText("macaddress");
-        EyeFiCard card = conf.getCard(macAddress);
-        if (card == null) {
-            throw new IOException("Card not found " + macAddress);
-        }
         TarReader tr = new TarReader(stream);
         for (TarEntry te = tr.nextEntry(); te != null; te = tr.nextEntry()) {
             InputStream in = te.getInputStream();
             try {
-                fileHandler.handleFile(card, te.getFileName(), in);
+                if (upload != null) {
+                    upload.handleFile(te.getFileName(), in);
+                }
             } finally {
                 in.close();
             }
         }
-        return stream.checksum(card.getUploadKey());
+        return card == null ? null : stream.checksum(card.getUploadKey());
     }
 
     private static void writeXML(Document doc, OutputStream out,
