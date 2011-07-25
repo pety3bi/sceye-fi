@@ -6,7 +6,6 @@ import org.tastefuljava.sceyefi.server.EyeFiServer;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.tastefuljava.sceyefi.server.DiskFileHandler;
 
 public class Main {
     private static File settings = null;
