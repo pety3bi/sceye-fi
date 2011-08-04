@@ -152,13 +152,13 @@ public class EyeFiServer {
             byte boundary[] = parms.get("boundary").getBytes(encoding);
             InputStream in = exchange.getRequestBody();
             boolean success = false;
+            UploadHandler upload = null;
             try {
                 byte[] calculatedDigest = null;
                 boolean failed = false;
                 Document request = null;
                 Element req = null;
                 EyeFiCard card = null;
-                UploadHandler upload = null;
                 Multipart mp = new Multipart(in, encoding, boundary);
                 Part part = mp.nextPart();
                 while (part != null) {
@@ -189,18 +189,20 @@ public class EyeFiServer {
                         } else if (fieldName.equals("FILENAME")) {
                             if (upload == null) {
                                 LOG.severe("No upload handler");
+                                failed = true;
                             }
                             calculatedDigest = uploadFile(
                                     card, upload, cdParms, is);
                         } else if (fieldName.equals("INTEGRITYDIGEST")) {
-                            if (calculatedDigest == null) {
-                                LOG.severe("No upload handler");
-                            }
                             Reader reader = new InputStreamReader(is, encoding);
                             BufferedReader br = new BufferedReader(reader);
                             String s = br.readLine();
                             byte[] digest = Bytes.hex2bin(s);
-                            if (Bytes.equals(digest, calculatedDigest)) {
+                            if (calculatedDigest == null) {
+                                LOG.severe("No upload handler");
+                                failed = true;
+                                success = false;
+                            } else if (Bytes.equals(digest, calculatedDigest)) {
                                 success = !failed;
                             } else {
                                 LOG.log(Level.SEVERE, 
