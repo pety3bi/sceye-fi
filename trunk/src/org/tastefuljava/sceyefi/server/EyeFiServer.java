@@ -10,8 +10,6 @@ import org.tastefuljava.sceyefi.conf.EyeFiConf;
 import org.tastefuljava.sceyefi.multipart.Multipart;
 import org.tastefuljava.sceyefi.multipart.Part;
 import org.tastefuljava.sceyefi.multipart.ValueParser;
-import org.tastefuljava.sceyefi.tar.TarEntry;
-import org.tastefuljava.sceyefi.tar.TarReader;
 import org.tastefuljava.sceyefi.util.Bytes;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,7 +35,6 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.tastefuljava.sceyefi.spi.EyeFiHandler;
-import org.tastefuljava.sceyefi.spi.UploadHandler;
 import org.tastefuljava.sceyefi.util.LogWriter;
 
 public class EyeFiServer {
@@ -149,95 +146,12 @@ public class EyeFiServer {
             if (encoding == null) {
                 encoding = "ISO-8859-1";
             }
-            byte boundary[] = parms.get("boundary").getBytes(encoding);
+            boolean success;
             InputStream in = exchange.getRequestBody();
-            boolean success = false;
-            UploadHandler upload = null;
             try {
-                byte[] calculatedDigest = null;
-                boolean failed = false;
-                Document request = null;
-                Element req = null;
-                EyeFiCard card = null;
+                byte boundary[] = parms.get("boundary").getBytes(encoding);
                 Multipart mp = new Multipart(in, encoding, boundary);
-                Part part = mp.nextPart();
-                while (part != null) {
-                    InputStream is = part.getBody();
-                    try {
-                        String cd = part.getFirstValue("content-disposition");
-                        Map<String,String> cdParms = ValueParser.parse(cd);
-                        String fieldName = cdParms.get("name");
-                        if (fieldName.equals("SOAPENVELOPE")) {
-                            SAXBuilder builder = new SAXBuilder();
-                            request = builder.build(is);
-                            logXML(Level.FINE, request);
-                            req = SoapEnvelope.strip(request);
-                            String macAddress = req.getChildText("macaddress");
-                            if (macAddress == null) {
-                                LOG.severe("No mac address in request");
-                                failed = true;
-                            } else {
-                                card = conf.getCard(macAddress);
-                                if (card == null) {
-                                    LOG.log(Level.SEVERE, "Card not found {0}",
-                                            macAddress);
-                                    failed = true;
-                                }
-                                String arcName = req.getChildText("filename");
-                                upload = handler.startUpload(card, arcName);
-                            }
-                        } else if (fieldName.equals("FILENAME")) {
-                            if (upload == null) {
-                                LOG.severe("No upload handler");
-                                failed = true;
-                            }
-                            calculatedDigest = uploadFile(
-                                    card, upload, cdParms, is);
-                        } else if (fieldName.equals("INTEGRITYDIGEST")) {
-                            Reader reader = new InputStreamReader(is, encoding);
-                            BufferedReader br = new BufferedReader(reader);
-                            String s = br.readLine();
-                            byte[] digest = Bytes.hex2bin(s);
-                            if (calculatedDigest == null) {
-                                LOG.severe("No upload handler");
-                                failed = true;
-                                success = false;
-                            } else if (Bytes.equals(digest, calculatedDigest)) {
-                                success = !failed;
-                            } else {
-                                LOG.log(Level.SEVERE, 
-                                        "Integrity digest don''t match: "
-                                        + "actual={0}, expected={1}",
-                                        new Object[]{
-                                            Bytes.bin2hex(calculatedDigest),
-                                            s
-                                        });
-                                failed = true;
-                                success = false;
-                            }
-                        } else {
-                            LOG.log(Level.WARNING, "Unknown field name: {0}",
-                                    fieldName);
-                            logHeaders(Level.FINE, part.getHeaders());
-                            Reader reader = new InputStreamReader(is, encoding);
-                            BufferedReader br = new BufferedReader(reader);
-                            for (String s = br.readLine(); s != null;
-                                    s = br.readLine()) {
-                                LOG.fine(s);
-                            }
-                        }
-                    } finally {
-                        is.close();
-                    }
-                    part = mp.nextPart();
-                }
-                if (upload != null) {
-                    if (success) {
-                        upload.commit();
-                    } else {
-                        upload.abort();
-                    }
-                }
+                success = processParts(mp, encoding);
             } finally {
                 in.close();
             }
@@ -269,6 +183,60 @@ public class EyeFiServer {
         } catch (JDOMException ex) {
             Logger.getLogger(EyeFiServer.class.getName()).log(Level.SEVERE, null, ex);
             throw new IOException(ex.getMessage());
+        }
+    }
+
+    private boolean processParts(Multipart mp, String encoding)
+            throws IOException, JDOMException {
+        boolean success;
+        Uploader uploader = new Uploader(conf, handler);
+        try {
+            for (Part part = mp.nextPart(); part != null;
+                    part = mp.nextPart()) {
+                processPart(uploader, part, encoding);
+            }
+        } finally {
+            success = uploader.close();
+        }
+        return success;
+    }
+
+    private void processPart(Uploader uploader, Part part, String encoding)
+            throws JDOMException, IOException {
+        InputStream is = part.getBody();
+        try {
+            String cd = part.getFirstValue("content-disposition");
+            Map<String,String> cdParms = ValueParser.parse(cd);
+            String fieldName = cdParms.get("name");
+            if (fieldName.equals("SOAPENVELOPE")) {
+                SAXBuilder builder = new SAXBuilder();
+                Document request = builder.build(is);
+                logXML(Level.FINE, request);
+                Element req = SoapEnvelope.strip(request);
+                uploader.start(
+                        req.getChildText("macaddress"),
+                        req.getChildText("filename"));
+            } else if (fieldName.equals("FILENAME")) {
+                uploader.upload(is);
+            } else if (fieldName.equals("INTEGRITYDIGEST")) {
+                Reader reader = new InputStreamReader(is, encoding);
+                BufferedReader br = new BufferedReader(reader);
+                String s = br.readLine();
+                byte[] digest = Bytes.hex2bin(s);
+                uploader.verifyChecksum(digest);
+            } else {
+                LOG.log(Level.WARNING, "Unknown field name: {0}",
+                        fieldName);
+                logHeaders(Level.FINE, part.getHeaders());
+                Reader reader = new InputStreamReader(is, encoding);
+                BufferedReader br = new BufferedReader(reader);
+                for (String s = br.readLine(); s != null;
+                        s = br.readLine()) {
+                    LOG.fine(s);
+                }
+            }
+        } finally {
+            is.close();
         }
     }
 
@@ -357,23 +325,6 @@ public class EyeFiServer {
             Logger.getLogger(EyeFiServer.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex.getMessage());
         }
-    }
-
-    private byte[] uploadFile(EyeFiCard card, UploadHandler upload,
-            Map<String,String> cdParms, InputStream input) throws IOException {
-        ChecksumInputStream stream = new ChecksumInputStream(input);
-        TarReader tr = new TarReader(stream);
-        for (TarEntry te = tr.nextEntry(); te != null; te = tr.nextEntry()) {
-            InputStream in = te.getInputStream();
-            try {
-                if (upload != null) {
-                    upload.handleFile(te.getFileName(), in);
-                }
-            } finally {
-                in.close();
-            }
-        }
-        return card == null ? null : stream.checksum(card.getUploadKey());
     }
 
     private static void writeXML(Document doc, OutputStream out,
