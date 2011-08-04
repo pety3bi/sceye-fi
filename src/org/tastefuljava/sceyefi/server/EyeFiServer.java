@@ -122,13 +122,13 @@ public class EyeFiServer {
                 out.close();
             }
         } catch (IOException ex) {
-            Logger.getLogger(EyeFiServer.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             throw ex;
         } catch (RuntimeException ex) {
-            Logger.getLogger(EyeFiServer.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             throw ex;
         } catch (JDOMException ex) {
-            Logger.getLogger(EyeFiServer.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             throw new IOException(ex.getMessage());
         }
     }
@@ -175,13 +175,13 @@ public class EyeFiServer {
                 out.close();
             }
         } catch (IOException ex) {
-            Logger.getLogger(EyeFiServer.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             throw ex;
         } catch (RuntimeException ex) {
-            Logger.getLogger(EyeFiServer.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             throw ex;
         } catch (JDOMException ex) {
-            Logger.getLogger(EyeFiServer.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             throw new IOException(ex.getMessage());
         }
     }
@@ -322,7 +322,7 @@ public class EyeFiServer {
             }
             return digest.digest();
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(EyeFiServer.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex.getMessage());
         }
     }

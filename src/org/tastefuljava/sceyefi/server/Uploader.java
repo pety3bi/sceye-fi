@@ -39,8 +39,7 @@ class Uploader {
         } else {
             card = conf.getCard(macAddress);
             if (card == null) {
-                LOG.log(Level.SEVERE, "Card not found {0}",
-                        macAddress);
+                LOG.log(Level.SEVERE, "Card not found {0}", macAddress);
                 failed = true;
             }
             upload = handler.startUpload(card, arcName);
