@@ -68,14 +68,11 @@ class Uploader {
         }
     }
 
-    void verifyChecksum(byte[] digest) {
+    void verifyDigest(byte[] digest) {
         if (calculatedDigest == null) {
             LOG.severe("No upload handler");
             failed = true;
-            success = false;
-        } else if (Bytes.equals(digest, calculatedDigest)) {
-            success = !failed;
-        } else {
+        } else if (!Bytes.equals(digest, calculatedDigest)) {
             LOG.log(Level.SEVERE, 
                     "Integrity digest don''t match: "
                     + "actual={0}, expected={1}",
@@ -84,8 +81,8 @@ class Uploader {
                         Bytes.bin2hex(digest)
                     });
             failed = true;
-            success = false;
         }
+        success = !failed;
     }
 
     boolean close() {
