@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.tastefuljava.sceyefi.conf.EyeFiCard;
 import org.tastefuljava.sceyefi.conf.Media;
@@ -19,13 +20,13 @@ public class DiskFileHandler implements EyeFiHandler {
         return new UploadHandler() {
             private List<File> files = new ArrayList<File>();
 
-            public void handleFile(String fileName, InputStream in)
-                    throws IOException {
+            public void handleFile(String fileName, Date timestamp,
+                    InputStream in) throws IOException {
                 Media media = card.getMedia(Media.TYPE_PHOTO);
                 if (media == null) {
                     throw new IOException("No photo media in Eye-Fi settings");
                 }
-                File folder = media.getFolder();
+                File folder = media.folderForDate(timestamp);
                 if (!folder.isDirectory() && !folder.mkdirs()) {
                     throw new IOException("Could not create folder " + folder);
                 }

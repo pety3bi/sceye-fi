@@ -3,6 +3,7 @@ package org.tastefuljava.sceyefi.tar;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 
 public class TarReader {
     private static final int BLOCK_SIZE = 512;
@@ -33,7 +34,7 @@ public class TarReader {
         String fileName = getHeaderField(0, 100);
         final long length = Long.parseLong(getHeaderField(124, 12), 8);
         long lastModified = Long.parseLong(getHeaderField(136, 12), 8)*1000L;
-        return new TarEntry(fileName, lastModified, length,
+        return new TarEntry(fileName, new Date(lastModified), length,
                 new InputStream() {
             private long pos;
             private int index;

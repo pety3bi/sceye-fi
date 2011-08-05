@@ -2,6 +2,7 @@ package org.tastefuljava.sceyefi.server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.tastefuljava.sceyefi.conf.EyeFiCard;
@@ -56,7 +57,8 @@ class Uploader {
                     if (upload == null) {
                         failed = true;
                     } else {
-                        upload.handleFile(te.getFileName(), in);
+                        upload.handleFile(te.getFileName(),
+                                te.getLastModified(), in);
                     }
                 }
             } finally {
