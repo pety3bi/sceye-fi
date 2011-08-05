@@ -5,6 +5,11 @@ import org.jdom.Element;
 
 public class Media {
     public static final int TYPE_PHOTO = 1;
+    public static final int TYPE_MOVIE = 2;
+    public static final int TYPE_RAW = 4;
+
+    public static final int DATE_UPLOAD = 0;
+    public static final int DATE_CREATED = 1;
 
     private int type;
     private File folder;
