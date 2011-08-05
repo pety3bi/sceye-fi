@@ -1,14 +1,15 @@
 package org.tastefuljava.sceyefi.tar;
 
 import java.io.InputStream;
+import java.util.Date;
 
 public class TarEntry {
     private String fileName;
-    private long lastModified;
+    private Date lastModified;
     private long length;
     private InputStream in;
 
-    TarEntry(String fileName, long lastModified, long length, InputStream in) {
+    TarEntry(String fileName, Date lastModified, long length, InputStream in) {
         this.fileName = fileName;
         this.lastModified = lastModified;
         this.length = length;
@@ -19,7 +20,7 @@ public class TarEntry {
         return fileName;
     }
 
-    public long getLastModified() {
+    public Date getLastModified() {
         return lastModified;
     }
 
