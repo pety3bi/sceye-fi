@@ -223,7 +223,7 @@ public class EyeFiServer {
                 BufferedReader br = new BufferedReader(reader);
                 String s = br.readLine();
                 byte[] digest = Bytes.hex2bin(s);
-                uploader.verifyChecksum(digest);
+                uploader.verifyDigest(digest);
             } else {
                 LOG.log(Level.WARNING, "Unknown field name: {0}",
                         fieldName);
