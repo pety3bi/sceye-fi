@@ -1,0 +1,14 @@
+#summary Embedding sceye-fi in your application
+
+= Embedding sceye-fi in your application =
+
+An Eye-Fi server is started by invoking the start method of class org.tastefuljava.sceyefi.server.EyeFiServer. The method returns an instance of the EyeFiServer class. To shut it down, call the close() method:
+
+{{{
+    EyeFiServer server = EyeFiServer.start(conf, new DiskFileHandler());
+    try {
+        // ... a lot of useful stuff
+    } finally {
+        server.close();
+    }
+}}}
