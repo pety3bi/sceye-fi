@@ -2,6 +2,16 @@
 
 = Embedding sceye-fi in your application =
 
+First, you need to load a configuration file with one of the load() static methods in class org.tastefuljava.sceyefi.conf.EyeFiConf:
+
+{{{
+    public static EyeFiConf load() throws IOException;
+    public static EyeFiConf load(File file) throws IOException;
+    public static EyeFiConf load(URL url) throws IOException;
+}}}
+
+The one that takes no parameter will try to find a Settings.xml file either in *user.home*/Application Data/Eye-Fi/ or *user.home*/Library/Eye-Fi/.
+
 An Eye-Fi server is started by invoking the start method of class org.tastefuljava.sceyefi.server.EyeFiServer. The method returns an instance of the EyeFiServer class. To shut it down, call the close() method:
 
 {{{
