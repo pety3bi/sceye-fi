@@ -2,7 +2,7 @@
 
 = Embedding sceye-fi in your application =
 
-First, you need to load a configuration file with one of the load() static methods in class org.tastefuljava.sceyefi.conf.EyeFiConf:
+First, you need to load a configuration file with one of the load() static methods in class `org.tastefuljava.sceyefi.conf.EyeFiConf`:
 
 {{{
     public static EyeFiConf load() throws IOException;
@@ -10,20 +10,20 @@ First, you need to load a configuration file with one of the load() static metho
     public static EyeFiConf load(URL url) throws IOException;
 }}}
 
-The one that takes no parameter will try to find a Settings.xml file either in *user.home*/Application Data/Eye-Fi/ or *user.home*/Library/Eye-Fi/.
+The one that takes no parameter will try to find a Settings.xml file either in `<user.home>/Application Data/Eye-Fi/` or `<user.home>/Library/Eye-Fi/`.
 
-An Eye-Fi server is started by invoking the start method of class org.tastefuljava.sceyefi.server.EyeFiServer. The method returns an instance of the EyeFiServer class. To shut it down, call the close() method:
+An Eye-Fi server is started by invoking the start method of class `org.tastefuljava.sceyefi.server.EyeFiServer`. The method returns an instance of the `EyeFiServer` class. To shut it down, call the close() method:
 
 {{{
     EyeFiConf conf = EyeFiConf.load();
     EyeFiServer server = EyeFiServer.start(conf, new DiskFileHandler());
     try {
-        // ... a lot of useful stuff
+        // ... a lot of great stuff
     } finally {
         server.close();
     }
 }}}
 
-As you can see in the above code, you can also pass a handler to the server. The handler must implement the org.tastefuljava.sceyefi.spi.EyeFiHandler interface. The class org.tastefuljava.sceyefi.DiskFileHandler implements that interface. It's an instance of that class that is passed to the Eye-Fi server when sceye-fi is used standalone.
+As you can see in the above code, you can also pass a handler to the server. The handler must implement the `org.tastefuljava.sceyefi.spi.EyeFiHandler` interface. The class `org.tastefuljava.sceyefi.DiskFileHandler` implements that interface. It's an instance of that class that is passed to the Eye-Fi server when sceye-fi is used standalone.
 
-You may want to supply your own handler to customize the handling of the uploaded files.
+You may want to write your own handler to customize the handling of the uploaded files.
