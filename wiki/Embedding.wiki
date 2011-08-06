@@ -15,6 +15,7 @@ The one that takes no parameter will try to find a Settings.xml file either in *
 An Eye-Fi server is started by invoking the start method of class org.tastefuljava.sceyefi.server.EyeFiServer. The method returns an instance of the EyeFiServer class. To shut it down, call the close() method:
 
 {{{
+    EyeFiConf conf = EyeFiConf.load();
     EyeFiServer server = EyeFiServer.start(conf, new DiskFileHandler());
     try {
         // ... a lot of useful stuff
@@ -22,3 +23,7 @@ An Eye-Fi server is started by invoking the start method of class org.tastefulja
         server.close();
     }
 }}}
+
+As you can see in the above code, you can also pass a handler to the server. The handler must implement the org.tastefuljava.sceyefi.spi.EyeFiHandler interface. The class org.tastefuljava.sceyefi.DiskFileHandler implements that interface. It's an instance of that class that is passed to the Eye-Fi server when sceye-fi is used standalone.
+
+You may want to supply your own handler to customize the handling of the uploaded files.
