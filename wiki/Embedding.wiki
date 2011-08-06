@@ -27,3 +27,13 @@ An Eye-Fi server is started by invoking the start method of class `org.tastefulj
 As you can see in the above code, you can also pass a handler to the server. The handler must implement the `org.tastefuljava.sceyefi.spi.EyeFiHandler` interface. The class `org.tastefuljava.sceyefi.DiskFileHandler` implements that interface. It's an instance of that class that is passed to the Eye-Fi server when sceye-fi is used standalone.
 
 You may want to write your own handler to customize the handling of the uploaded files.
+
+When the server receives a file from an Eye-Fi card, it calls the `startUpload` method of the `EyeFiHandler`:
+
+{{{
+public UploadHandler startUpload(EyeFiCard card, String archiveName);
+}}}
+
+It passes the `EyeFiCard` object that it had found in the configuration, as well of the name of the archive being received.
+
+The method returns an `UploadHandler` that is responsible for storing the uploaded files. The server calls the `handleFile` method for each received file (including the log files), then calls the `commit` method if everything is ok, or the `abort` method if anything went wrong, such as if the integrity check fails.
