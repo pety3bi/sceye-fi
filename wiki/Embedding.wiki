@@ -1,4 +1,5 @@
 #summary Embedding sceye-fi in your application
+#labels Featured
 
 = Embedding sceye-fi in your application =
 
