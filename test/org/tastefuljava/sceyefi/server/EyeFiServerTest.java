@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.tastefuljava.sceyefi.client.EyeFiClient;
 import org.tastefuljava.sceyefi.conf.EyeFiConf;
 import org.tastefuljava.sceyefi.conf.EyeFiConfTest;
+import org.tastefuljava.sceyefi.tar.TarReaderTest;
 
 public class EyeFiServerTest {
     private static final URL SETTINGS_URL
@@ -48,7 +49,7 @@ public class EyeFiServerTest {
 
     @Test
     public void testIt() throws Exception {
-        client.startSession();
-        client.getPhotoStatus("P1030007.JPG.tar", 1269760);
+        URL url = TarReaderTest.class.getResource("P1030001.JPG.tar");
+        client.uploadArchive(url);
     }
 }

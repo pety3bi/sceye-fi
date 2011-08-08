@@ -32,7 +32,7 @@ public class ChecksumInputStream extends InputStream {
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        int n = super.read(b, off, len);
+        int n = in.read(b, off, len);
         calc.processBytes(b, off, n);
         return n;
     }
