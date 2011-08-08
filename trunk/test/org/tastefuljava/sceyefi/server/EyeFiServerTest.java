@@ -8,7 +8,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.tastefuljava.sceyefi.DiskFileHandler;
 import org.tastefuljava.sceyefi.client.EyeFiClient;
 import org.tastefuljava.sceyefi.conf.EyeFiConf;
 import org.tastefuljava.sceyefi.conf.EyeFiConfTest;
@@ -25,11 +24,11 @@ public class EyeFiServerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        File tempFile = File.createTempFile("aa", ".bbb");
+        File tempFile = File.createTempFile("aaa", ".bbb");
         tempDir = tempFile.getParentFile();
         tempFile.delete();
         EyeFiConf conf = EyeFiConf.load(SETTINGS_URL);
-        server = EyeFiServer.start(conf, new DiskFileHandler());
+        server = EyeFiServer.start(conf, new FileEyeFiHandler(tempDir));
     }
 
     @AfterClass
@@ -48,6 +47,6 @@ public class EyeFiServerTest {
     }
 
     @Test
-    public void testStart() throws Exception {
+    public void testIt() throws Exception {
     }
 }
