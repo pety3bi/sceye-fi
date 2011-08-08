@@ -2,21 +2,34 @@ package org.tastefuljava.sceyefi.server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class ChecksumInputStream extends InputStream {
     private InputStream in;
-    private boolean eof;
-    private ChecksumCalculator calc = new ChecksumCalculator();
+    private int count;
+    private int lobyte;
+    private int sum;
+    private MessageDigest digest;
+    private boolean eof = false;
 
     public ChecksumInputStream(InputStream in) {
-        this.in = in;
+        try {
+            this.in = in;
+            digest = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
     }
 
     public byte[] checksum(byte[] key) throws IOException {
         while (!eof) {
             read();
         }
-        return calc.checksum(key);
+        while (count != 0) {
+            processByte(0);
+        }
+        return digest.digest(key);
     }
 
     @Override
@@ -26,14 +39,28 @@ public class ChecksumInputStream extends InputStream {
             eof = true;
             return b;
         }
-        calc.processByte(b);
+        processByte(b);
         return b;
     }
 
-    @Override
-    public int read(byte[] b, int off, int len) throws IOException {
-        int n = in.read(b, off, len);
-        calc.processBytes(b, off, n);
-        return n;
+    private void processByte(int b) {
+        ++count;
+        if (count%2 != 0) {
+            lobyte = b;
+        } else {
+            sum += lobyte | (b << 8);
+            if (count == 512) {
+                int hiword = sum >>> 16;
+                while (hiword != 0) {
+                    sum = (sum & 0xFFFF) + hiword;
+                    hiword = sum >>> 16;
+                }
+                sum ^= 0xFFFF;
+                digest.update((byte)(sum & 0xFF));
+                digest.update((byte)(sum >>> 8));
+                sum = 0;
+                count = 0;
+            }
+        }
     }
 }
