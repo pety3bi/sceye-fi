@@ -3,6 +3,7 @@ package org.tastefuljava.sceyefi.server;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -14,6 +15,8 @@ import org.tastefuljava.sceyefi.conf.EyeFiConfTest;
 import org.tastefuljava.sceyefi.tar.TarReaderTest;
 
 public class EyeFiServerTest {
+    private static final Logger LOG
+            = Logger.getLogger(EyeFiServerTest.class.getName());
     private static final URL SETTINGS_URL
             = EyeFiConfTest.class.getResource("Settings.xml");
     private static File tempDir;
@@ -25,9 +28,8 @@ public class EyeFiServerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        File tempFile = File.createTempFile("aaa", ".bbb");
-        tempDir = tempFile.getParentFile();
-        tempFile.delete();
+        tempDir = new File(System.getProperty("user.home"), "EyeFiTemp");
+        tempDir.mkdir();
         EyeFiConf conf = EyeFiConf.load(SETTINGS_URL);
         server = EyeFiServer.start(conf, new FileEyeFiHandler(tempDir));
     }
