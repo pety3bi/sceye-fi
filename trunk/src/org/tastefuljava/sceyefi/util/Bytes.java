@@ -1,5 +1,7 @@
 package org.tastefuljava.sceyefi.util;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 public class Bytes {
@@ -53,6 +55,18 @@ public class Bytes {
         Random random = new Random();
         random.nextBytes(result);
         return result;
+    }
+
+    public static byte[] md5(byte[]... args) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            for (byte[] arg : args) {
+                digest.update(arg);
+            }
+            return digest.digest();
+        } catch (NoSuchAlgorithmException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
     }
 
     private static int charValue(char c) {
