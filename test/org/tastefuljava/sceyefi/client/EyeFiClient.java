@@ -200,6 +200,14 @@ public class EyeFiClient {
         }
     }
 
+    public void markLastPhotoInRoll() throws JDOMException, IOException {
+        Element req = new Element("MarkLastPhotoInRoll", REQUEST_NAMESPACE);
+        req.addContent(new Element("macaddress").setText(card.getMacAddress()));
+        req.addContent(new Element("mergedelta").setText("0"));
+        Element resp = simpleAction(req);
+        logXML(Level.FINE, resp);
+    }
+
     public void uploadArchive(URL url) throws IOException, JDOMException {
         URLConnection con = url.openConnection();
         InputStream in = con.getInputStream();
@@ -208,6 +216,7 @@ public class EyeFiClient {
             getPhotoStatus(url.getFile(), con.getContentLength());
             uploadArchive(in, url.getFile(), con.getContentLength(),
                     new Date(con.getLastModified()));
+            markLastPhotoInRoll();
         } finally {
             in.close();
         }
