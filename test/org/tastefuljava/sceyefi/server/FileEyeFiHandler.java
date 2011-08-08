@@ -35,6 +35,7 @@ public class FileEyeFiHandler implements EyeFiHandler {
                 } finally {
                     out.close();
                 }
+                file.setLastModified(timestamp.getTime());
                 files.add(file);
             }
 
