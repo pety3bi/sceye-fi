@@ -38,3 +38,48 @@ public UploadHandler startUpload(EyeFiCard card, String archiveName);
 It passes the `EyeFiCard` object that it had found in the configuration, as well of the name of the archive being received.
 
 The method returns an `UploadHandler` that is responsible for storing the uploaded files. The server calls the `handleFile` method for each received file (including the log files), then calls the `commit` method if everything is ok, or the `abort` method if anything went wrong, such as if the integrity check fails.
+
+== Example: ==
+
+{{{
+
+public class FileEyeFiHandler implements EyeFiHandler {
+    private File folder;
+
+    public FileEyeFiHandler(File folder) {
+        this.folder = folder;
+    }
+
+    public UploadHandler startUpload(EyeFiCard card, String archiveName) {
+        return new UploadHandler() {
+            private List<File> files = new ArrayList<File>();
+
+            public void handleFile(String fileName, Date timestamp,
+                    InputStream in) throws IOException {
+                File file = new File(folder, fileName);
+                OutputStream out = new FileOutputStream(file);
+                try {
+                    byte buf[] = new byte[4096];
+                    for (int n = in.read(buf); n >= 0; n = in.read(buf)) {
+                        out.write(buf, 0, n);
+                    }
+                } finally {
+                    out.close();
+                }
+                files.add(file);
+            }
+
+            public void abort() {
+                while (!files.isEmpty()) {
+                    File file = files.remove(0);
+                    file.delete();
+                }
+            }
+
+            public void commit() {
+                files.clear();
+            }
+        };
+    }
+}
+}}}
