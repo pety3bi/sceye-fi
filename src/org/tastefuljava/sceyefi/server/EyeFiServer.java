@@ -204,6 +204,7 @@ public class EyeFiServer {
 
     private void processPart(Uploader uploader, Part part, String encoding)
             throws JDOMException, IOException {
+        logHeaders(Level.FINE, part.getHeaders());
         InputStream is = part.getBody();
         try {
             String cd = part.getFirstValue("content-disposition");
