@@ -48,5 +48,7 @@ public class EyeFiServerTest {
 
     @Test
     public void testIt() throws Exception {
+        client.startSession();
+        client.getPhotoStatus("P1030007.JPG.tar", 1269760);
     }
 }

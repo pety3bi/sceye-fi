@@ -1,6 +1,7 @@
 package org.tastefuljava.sceyefi.server;
 
 import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -88,7 +89,9 @@ public class EyeFiServer {
     }
 
     public void close() {
-        httpServer.stop(30);
+        httpServer.removeContext(UPLOAD_CONTEXT);
+        httpServer.removeContext(MAIN_CONTEXT);
+        httpServer.stop(10);
         executor.shutdownNow();
     }
 

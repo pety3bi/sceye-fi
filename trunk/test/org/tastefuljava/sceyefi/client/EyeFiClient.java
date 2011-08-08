@@ -40,6 +40,9 @@ public class EyeFiClient {
         this.card = card;
     }
 
+    public void close() {
+    }
+
     private HttpURLConnection createConnection(
             boolean multipart, String action) throws IOException {
         StringBuilder buf = new StringBuilder();
