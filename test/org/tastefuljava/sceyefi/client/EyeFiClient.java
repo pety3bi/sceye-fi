@@ -99,12 +99,12 @@ public class EyeFiClient {
 
     public void startSession() throws IOException, JDOMException {
         Element req = new Element("StartSession", REQUEST_NAMESPACE);
-        req.addContent(new Element("macaddress").setText(card.getMacAddress()));
-        req.addContent(new Element("cnonce").setText(Bytes.bin2hex(cnonce)));
-        req.addContent(new Element("transfermode").setText(
-                Integer.toString(card.getTransferMode())));
-        req.addContent(new Element("transfermodetimestamp").setText(
-                Long.toString(card.getTimestamp())));
+        addChildText(req, "macaddress", card.getMacAddress());
+        addChildText(req, "cnonce", Bytes.bin2hex(cnonce));
+        addChildText(req, "transfermode", 
+                Integer.toString(card.getTransferMode()));
+        addChildText(req, "transfermodetimestamp", 
+                Long.toString(card.getTimestamp()));
         Element resp = simpleAction(req);
         byte[] credential = Bytes.md5(
                 Bytes.hex2bin(card.getMacAddress()),
@@ -124,14 +124,14 @@ public class EyeFiClient {
                 card.getUploadKey(),
                 snonce);
         Element req = new Element("GetPhotoStatus", REQUEST_NAMESPACE);
-        req.addContent(new Element("credential").setText(
-                Bytes.bin2hex(credential)));
-        req.addContent(new Element("macaddress").setText(card.getMacAddress()));
-        req.addContent(new Element("filename").setText(archiveName));
-        req.addContent(new Element("filesize").setText(Long.toString(size)));
-        req.addContent(new Element("filesignature").setText(
-                "343afd9e4e84d3d4f5969cd97214f7f2"));
-        req.addContent(new Element("flags").setText("4"));
+        addChildText(req, "credential", 
+                Bytes.bin2hex(credential));
+        addChildText(req, "macaddress", card.getMacAddress());
+        addChildText(req, "filename", archiveName);
+        addChildText(req, "filesize", Long.toString(size));
+        addChildText(req, "filesignature", 
+                "343afd9e4e84d3d4f5969cd97214f7f2");
+        addChildText(req, "flags", "4");
         Element resp = simpleAction(req);
         fileId = Long.parseLong(childText(resp, "fileid"));
     }
@@ -148,17 +148,13 @@ public class EyeFiClient {
             try {
                 // Envelope
                 Element req = new Element("UploadPhoto", REQUEST_NAMESPACE);
-                req.addContent(new Element("fileid", REQUEST_NAMESPACE).setText(
-                        Long.toString(fileId)));
-                req.addContent(new Element("macaddress", REQUEST_NAMESPACE).setText(
-                        card.getMacAddress()));
-                req.addContent(new Element("filename", REQUEST_NAMESPACE).setText(fileName));
-                req.addContent(new Element("filesize", REQUEST_NAMESPACE).setText(
-                        Long.toString(size)));
-                req.addContent(new Element("filesignature", REQUEST_NAMESPACE).setText(
-                        "343afd9e4e84d3d4f5969cd97214f7f2"));
-                req.addContent(new Element("encryption", REQUEST_NAMESPACE).setText("none"));
-                req.addContent(new Element("flags", REQUEST_NAMESPACE).setText("4"));
+                addChildText(req, "fileid", Long.toString(fileId));
+                addChildText(req, "macaddress", card.getMacAddress());
+                addChildText(req, "filename", fileName);
+                addChildText(req, "filesize", Long.toString(size));
+                addChildText(req, "filesignature", "343afd9e4e84d3d4f5969cd97214f7f2");
+                addChildText(req, "encryption", "none");
+                addChildText(req, "flags", "4");
                 out.write(("\r\n--" + boundary + "\r\n").getBytes("ASCII"));
                 out.write("Content-Disposition: form-data; name=\"SOAPENVELOPE\"\r\n\r\n".getBytes("ASCII"));
                 XMLOutputter outp = new XMLOutputter();
@@ -166,7 +162,8 @@ public class EyeFiClient {
                 outp.output(doc, out);
                 logXML(Level.FINE, doc);
                 out.write(("\r\n--" + boundary + "\r\n").getBytes("ASCII"));
-                out.write(("Content-Disposition: form-data; name=\"FILENAME\"\r\n"
+                out.write(("Content-Disposition: form-data; name=\"FILENAME\""
+                        + "; filename=\"" + fileName + "\"\r\n"
                         + "Content-Type: application/x-tar\r\n\r\n").getBytes("ASCII"));
                 ChecksumInputStream in = new ChecksumInputStream(input);
                 try {
@@ -211,8 +208,8 @@ public class EyeFiClient {
 
     public void markLastPhotoInRoll() throws JDOMException, IOException {
         Element req = new Element("MarkLastPhotoInRoll", REQUEST_NAMESPACE);
-        req.addContent(new Element("macaddress").setText(card.getMacAddress()));
-        req.addContent(new Element("mergedelta").setText("0"));
+        addChildText(req, "macaddress", card.getMacAddress());
+        addChildText(req, "mergedelta", "0");
         Element resp = simpleAction(req);
     }
 
@@ -237,10 +234,16 @@ public class EyeFiClient {
             EyeFiCard card = conf.getCards()[0];
             EyeFiClient client = new EyeFiClient("localhost", card);
             URL url = TarReaderTest.class.getResource("P1030001.JPG.tar");
-            client.uploadArchive(url, "P1030001.RAW.tar");
+            client.uploadArchive(url, "P1030001.JPG.tar");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error", ex);
         }
+    }
+
+    private static void addChildText(Element elm, String name, String text) {
+        Element child = new Element(name, elm.getNamespace());
+        child.setText(text);
+        elm.addContent(child);
     }
 
     private static String childText(Element elm, String name) {

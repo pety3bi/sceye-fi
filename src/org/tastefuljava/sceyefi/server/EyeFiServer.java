@@ -215,8 +215,8 @@ public class EyeFiServer {
                 logXML(Level.FINE, request);
                 Element req = SoapEnvelope.strip(request);
                 uploader.start(
-                        req.getChildText("macaddress"),
-                        req.getChildText("filename"));
+                        childText(req, "macaddress"),
+                        childText(req, "filename"));
             } else if (fieldName.equals("FILENAME")) {
                 uploader.upload(is);
             } else if (fieldName.equals("INTEGRITYDIGEST")) {
@@ -260,14 +260,14 @@ public class EyeFiServer {
 
     private Element startSession(Element req)
             throws JDOMException, IOException {
-        String macAddress = req.getChildText("macaddress");
+        String macAddress = childText(req, "macaddress");
         EyeFiCard card = conf.getCard(macAddress);
         if (card == null) {
             throw new IOException("Card not found " + macAddress);
         }
-        byte[] cnonce = Bytes.hex2bin(req.getChildText("cnonce"));
-        String transferModeStr = req.getChildText("transfermode");
-        String timestampStr = req.getChildText("transfermodetimestamp");
+        byte[] cnonce = Bytes.hex2bin(childText(req, "cnonce"));
+        String transferModeStr = childText(req, "transfermode");
+        String timestampStr = childText(req, "transfermodetimestamp");
 
         byte[] credential = Bytes.md5(
                 Bytes.hex2bin(macAddress), cnonce, card.getUploadKey());
@@ -285,7 +285,7 @@ public class EyeFiServer {
     }
 
     private Element getPhotoStatus(Element req) throws IOException {
-        String macAddress = req.getChildText("macaddress");
+        String macAddress = childText(req, "macaddress");
         EyeFiCard card = conf.getCard(macAddress);
         if (card == null) {
             throw new IOException("Card not found " + macAddress);
@@ -293,7 +293,7 @@ public class EyeFiServer {
         byte[] credential = Bytes.md5(
                 Bytes.hex2bin(macAddress), card.getUploadKey(), snonce);
         String expectedCred = Bytes.bin2hex(credential);
-        String actualCred = req.getChildText("credential");
+        String actualCred = childText(req, "credential");
         if (!actualCred.equals(expectedCred)) {
             throw new IOException("Invalid credential send by the card");
         }
@@ -329,6 +329,14 @@ public class EyeFiServer {
                 out.close();
             }
         }
+    }
+
+    private static String childText(Element elm, String name) {
+        String s = elm.getChildText(name);
+        if (s != null) {
+            return s;
+        }
+        return elm.getChildText(name, elm.getNamespace());
     }
 
     private static void logHeaders(Level level,
