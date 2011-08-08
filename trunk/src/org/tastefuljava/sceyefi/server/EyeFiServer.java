@@ -44,6 +44,8 @@ public class EyeFiServer {
     private static final int WORKERS = 2;
     private static final String MAIN_CONTEXT = "/api/soap/eyefilm/v1";
     private static final String UPLOAD_CONTEXT = "/api/soap/eyefilm/v1/upload";
+    private static final Namespace EYEFI_NAMESPACE = Namespace.getNamespace(
+                    "ns1", "http://localhost/api/soap/eyefilm");
 
     private byte[] snonce = Bytes.randomBytes(16);
     private String snonceStr = Bytes.bin2hex(snonce);
@@ -156,9 +158,7 @@ public class EyeFiServer {
             } finally {
                 in.close();
             }
-            Namespace eyefiNs = Namespace.getNamespace(
-                    "ns1", "http://localhost/api/soap/eyefilm");
-            Element resp = new Element("UploadPhotoResponse", eyefiNs);
+            Element resp = new Element("UploadPhotoResponse", EYEFI_NAMESPACE);
             resp.addContent(new Element("success").setText(
                     success ? "true" : "false"));
             Document response = SoapEnvelope.wrap(resp);
@@ -273,9 +273,7 @@ public class EyeFiServer {
                 Bytes.hex2bin(macAddress), cnonce, card.getUploadKey());
         String credentialStr = Bytes.bin2hex(credential);
 
-        Namespace eyefiNs = Namespace.getNamespace(
-                "ns1", "http://localhost/api/soap/eyefilm");
-        Element resp = new Element("StartSessionResponse", eyefiNs);
+        Element resp = new Element("StartSessionResponse", EYEFI_NAMESPACE);
         resp.addContent(new Element("credential").setText(credentialStr));
         resp.addContent(new Element("snonce").setText(snonceStr));
         resp.addContent(
@@ -299,9 +297,7 @@ public class EyeFiServer {
         if (!actualCred.equals(expectedCred)) {
             throw new IOException("Invalid credential send by the card");
         }
-        Namespace eyefiNs = Namespace.getNamespace(
-                "ns1", "http://localhost/api/soap/eyefilm");
-        Element resp = new Element("GetPhotoStatusResponse", eyefiNs);
+        Element resp = new Element("GetPhotoStatusResponse", EYEFI_NAMESPACE);
         int fileId = ++lastFileId;
         resp.addContent(new Element("fileid").setText("" + fileId));
         resp.addContent(new Element("offset").setText("0"));
@@ -309,9 +305,7 @@ public class EyeFiServer {
     }
 
     private Element markLastPhotoInRoll(Element req) {
-        Namespace eyefiNs = Namespace.getNamespace(
-                "ns1", "http://localhost/api/soap/eyefilm");
-        Element resp = new Element("MarkLastPhotoInRollResponse", eyefiNs);
+        Element resp = new Element("MarkLastPhotoInRollResponse", EYEFI_NAMESPACE);
         return resp;
     }
 
