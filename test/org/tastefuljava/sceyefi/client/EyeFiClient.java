@@ -32,7 +32,7 @@ public class EyeFiClient {
 
     private static final int EYEFI_PORT = 59278;
     private static final Namespace REQUEST_NAMESPACE = Namespace.getNamespace(
-            "ns1", "EyeFi/SOAP/EyeFilm");
+            "EyeFi/SOAP/EyeFilm");
 
     private String hostName;
     private EyeFiCard card;
@@ -77,7 +77,9 @@ public class EyeFiClient {
             OutputStream out = con.getOutputStream();
             try {
                 XMLOutputter outp = new XMLOutputter();
-                outp.output(SoapEnvelope.wrap(req), out);
+                Document doc = SoapEnvelope.wrap(req);
+                logXML(Level.FINE, doc);
+                outp.output(doc, out);
             } finally {
                 out.close();
             }
@@ -85,6 +87,7 @@ public class EyeFiClient {
             try {
                 SAXBuilder builder = new SAXBuilder();
                 Document doc = builder.build(in);
+                logXML(Level.FINE, doc);
                 return SoapEnvelope.strip(doc);
             } finally {
                 in.close();
@@ -103,18 +106,15 @@ public class EyeFiClient {
         req.addContent(new Element("transfermodetimestamp").setText(
                 Long.toString(card.getTimestamp())));
         Element resp = simpleAction(req);
-        logXML(Level.FINE, resp);
         byte[] credential = Bytes.md5(
                 Bytes.hex2bin(card.getMacAddress()),
                 cnonce,
                 card.getUploadKey());
-        String h = resp.getChildText("credential", resp.getNamespace());
-        byte[] actualCred = Bytes.hex2bin(h);
+        byte[] actualCred = Bytes.hex2bin(childText(resp, "credential"));
         if (!Bytes.equals(credential, actualCred)) {
             throw new IOException("Invalid credential");
         }
-        snonce = Bytes.hex2bin(
-                resp.getChildText("snonce", resp.getNamespace()));
+        snonce = Bytes.hex2bin(childText(resp, "snonce"));
     }
 
     public void getPhotoStatus(String archiveName, long size)
@@ -133,9 +133,7 @@ public class EyeFiClient {
                 "343afd9e4e84d3d4f5969cd97214f7f2"));
         req.addContent(new Element("flags").setText("4"));
         Element resp = simpleAction(req);
-        logXML(Level.FINE, resp);
-        fileId = Long.parseLong(
-                resp.getChildText("fileid", resp.getNamespace()));
+        fileId = Long.parseLong(childText(resp, "fileid"));
     }
 
     public void uploadArchive(InputStream input, String fileName, long size,
@@ -150,21 +148,23 @@ public class EyeFiClient {
             try {
                 // Envelope
                 Element req = new Element("UploadPhoto", REQUEST_NAMESPACE);
-                req.addContent(new Element("fileid").setText(
+                req.addContent(new Element("fileid", REQUEST_NAMESPACE).setText(
                         Long.toString(fileId)));
-                req.addContent(new Element("macaddress").setText(
+                req.addContent(new Element("macaddress", REQUEST_NAMESPACE).setText(
                         card.getMacAddress()));
-                req.addContent(new Element("filename").setText(fileName));
-                req.addContent(new Element("filesize").setText(
+                req.addContent(new Element("filename", REQUEST_NAMESPACE).setText(fileName));
+                req.addContent(new Element("filesize", REQUEST_NAMESPACE).setText(
                         Long.toString(size)));
-                req.addContent(new Element("filesignature").setText(
+                req.addContent(new Element("filesignature", REQUEST_NAMESPACE).setText(
                         "343afd9e4e84d3d4f5969cd97214f7f2"));
-                req.addContent(new Element("encryption").setText("none"));
-                req.addContent(new Element("flags").setText("4"));
+                req.addContent(new Element("encryption", REQUEST_NAMESPACE).setText("none"));
+                req.addContent(new Element("flags", REQUEST_NAMESPACE).setText("4"));
                 out.write(("\r\n--" + boundary + "\r\n").getBytes("ASCII"));
                 out.write("Content-Disposition: form-data; name=\"SOAPENVELOPE\"\r\n\r\n".getBytes("ASCII"));
                 XMLOutputter outp = new XMLOutputter();
-                outp.output(SoapEnvelope.wrap(req), out);
+                Document doc = SoapEnvelope.wrap(req);
+                outp.output(doc, out);
+                logXML(Level.FINE, doc);
                 out.write(("\r\n--" + boundary + "\r\n").getBytes("ASCII"));
                 out.write(("Content-Disposition: form-data; name=\"FILENAME\"\r\n"
                         + "Content-Type: application/x-tar\r\n\r\n").getBytes("ASCII"));
@@ -181,7 +181,7 @@ public class EyeFiClient {
                 out.write(("\r\n--" + boundary + "\r\n").getBytes("ASCII"));
                 out.write("Content-Disposition: form-data; name=\"INTEGRITYDIGEST\"\r\n\r\n".getBytes("ASCII"));
                 out.write(Bytes.bin2hex(digest).getBytes("ASCII"));
-                out.write(("\r\n--" + boundary + "--").getBytes("ASCII"));
+                out.write(("\r\n--" + boundary + "--\r\n").getBytes("ASCII"));
             } finally {
                 out.close();
             }
@@ -194,10 +194,10 @@ public class EyeFiClient {
             try {
                 SAXBuilder builder = new SAXBuilder();
                 Document doc = builder.build(in);
+                logXML(Level.FINE, doc);
                 Element resp = SoapEnvelope.strip(doc);
-                logXML(Level.FINE, resp);
                 boolean success = "true".equalsIgnoreCase(
-                        resp.getChildText("success", resp.getNamespace()));
+                        childText(resp, "success"));
                 if (!success) {
                     throw new IOException("Upload failed");
                 }
@@ -214,7 +214,6 @@ public class EyeFiClient {
         req.addContent(new Element("macaddress").setText(card.getMacAddress()));
         req.addContent(new Element("mergedelta").setText("0"));
         Element resp = simpleAction(req);
-        logXML(Level.FINE, resp);
     }
 
     public void uploadArchive(URL url, String fileName) throws IOException, JDOMException {
@@ -223,7 +222,7 @@ public class EyeFiClient {
         try {
             startSession();
             getPhotoStatus(fileName, con.getContentLength());
-            uploadArchive(in, "P1030001.JPG.tar", con.getContentLength(),
+            uploadArchive(in, fileName, con.getContentLength(),
                     new Date(con.getLastModified()));
             markLastPhotoInRoll();
         } finally {
@@ -238,19 +237,27 @@ public class EyeFiClient {
             EyeFiCard card = conf.getCards()[0];
             EyeFiClient client = new EyeFiClient("localhost", card);
             URL url = TarReaderTest.class.getResource("P1030001.JPG.tar");
-            client.uploadArchive(url, "P1030001.JPG.tar");
+            client.uploadArchive(url, "P1030001.RAW.tar");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error", ex);
         }
     }
 
-    private static void logXML(Level level, Element elm) throws IOException {
+    private static String childText(Element elm, String name) {
+        String s = elm.getChildText(name);
+        if (s != null) {
+            return s;
+        }
+        return elm.getChildText(name, elm.getNamespace());
+    }
+
+    private static void logXML(Level level, Document doc) throws IOException {
         if (LOG.isLoggable(level)) {
             Writer out = new LogWriter(LOG, level);
             try {
                 XMLOutputter outp = new XMLOutputter();
                 outp.setFormat(Format.getPrettyFormat());
-                outp.output(elm, out);
+                outp.output(doc, out);
             } finally {
                 out.close();
             }
