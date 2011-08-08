@@ -52,6 +52,6 @@ public class EyeFiServerTest {
     @Test
     public void testIt() throws Exception {
         URL url = TarReaderTest.class.getResource("P1030001.JPG.tar");
-        client.uploadArchive(url);
+        client.uploadArchive(url, "P1030001.JPG.tar");
     }
 }
