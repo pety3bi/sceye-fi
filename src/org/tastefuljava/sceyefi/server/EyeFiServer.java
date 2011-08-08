@@ -19,8 +19,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.InetSocketAddress;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -44,7 +42,7 @@ public class EyeFiServer {
     private static final int EYEFI_PORT = 59278;
     private static final int WORKERS = 2;
     private static final String MAIN_CONTEXT = "/api/soap/eyefilm/v1";
-    public static final String UPLOAD_CONTEXT = "/api/soap/eyefilm/v1/upload";
+    private static final String UPLOAD_CONTEXT = "/api/soap/eyefilm/v1/upload";
 
     private byte[] snonce = Bytes.randomBytes(16);
     private String snonceStr = Bytes.bin2hex(snonce);
@@ -268,7 +266,7 @@ public class EyeFiServer {
         String transferModeStr = req.getChildText("transfermode");
         String timestampStr = req.getChildText("transfermodetimestamp");
 
-        byte[] credential = md5(
+        byte[] credential = Bytes.md5(
                 Bytes.hex2bin(macAddress), cnonce, card.getUploadKey());
         String credentialStr = Bytes.bin2hex(credential);
 
@@ -291,7 +289,7 @@ public class EyeFiServer {
         if (card == null) {
             throw new IOException("Card not found " + macAddress);
         }
-        byte[] credential = md5(
+        byte[] credential = Bytes.md5(
                 Bytes.hex2bin(macAddress), card.getUploadKey(), snonce);
         String expectedCred = Bytes.bin2hex(credential);
         String actualCred = req.getChildText("credential");
@@ -312,19 +310,6 @@ public class EyeFiServer {
                 "ns1", "http://localhost/api/soap/eyefilm");
         Element resp = new Element("MarkLastPhotoInRollResponse", eyefiNs);
         return resp;
-    }
-
-    private static byte[] md5(byte[]... args) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            for (byte[] arg : args) {
-                digest.update(arg);
-            }
-            return digest.digest();
-        } catch (NoSuchAlgorithmException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex.getMessage());
-        }
     }
 
     private static void writeXML(Document doc, OutputStream out,
