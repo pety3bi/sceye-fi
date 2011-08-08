@@ -105,17 +105,32 @@ public class EyeFiClient {
         snonce = Bytes.hex2bin(resp.getChildText("snonce"));
     }
 
-    public void getPhotoStatus(String archiveName, Date timestamp)
+    public void getPhotoStatus(String archiveName, long size)
             throws IOException, JDOMException {
-        
+        byte[] credential = Bytes.md5(
+                Bytes.hex2bin(card.getMacAddress()),
+                card.getUploadKey(),
+                snonce);
+        Element req = new Element("GetPhotoStatus");
+        req.addContent(new Element("credential").setText(
+                Bytes.bin2hex(credential)));
+        req.addContent(new Element("macaddress").setText(card.getMacAddress()));
+        req.addContent(new Element("filename").setText(archiveName));
+        req.addContent(new Element("filesize").setText(Long.toString(size)));
+        req.addContent(new Element("filesignature").setText(
+                "343afd9e4e84d3d4f5969cd97214f7f2"));
+        req.addContent(new Element("flags").setText("4"));
+        Element resp = simpleAction(req);
+        logXML(Level.FINE, resp);
     }
 
     public static void main(String args[]) {
         try {
             EyeFiConf conf = EyeFiConf.load();
-            EyeFiCard card = conf.getCard("001856417729");
+            EyeFiCard card = conf.getCards()[0];
             EyeFiClient client = new EyeFiClient("localhost", card);
             client.startSession();
+            client.getPhotoStatus("P1030007.JPG.tar", 1269760);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error", ex);
         }
