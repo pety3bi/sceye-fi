@@ -19,8 +19,10 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.tastefuljava.sceyefi.conf.EyeFiCard;
 import org.tastefuljava.sceyefi.conf.EyeFiConf;
+import org.tastefuljava.sceyefi.conf.EyeFiConfTest;
 import org.tastefuljava.sceyefi.server.ChecksumInputStream;
 import org.tastefuljava.sceyefi.server.SoapEnvelope;
+import org.tastefuljava.sceyefi.tar.TarReaderTest;
 import org.tastefuljava.sceyefi.util.Bytes;
 import org.tastefuljava.sceyefi.util.LogWriter;
 
@@ -30,7 +32,7 @@ public class EyeFiClient {
 
     private static final int EYEFI_PORT = 59278;
     private static final Namespace REQUEST_NAMESPACE = Namespace.getNamespace(
-            "EyeFi/SOAP/EyeFilm");
+            "ns1", "EyeFi/SOAP/EyeFilm");
 
     private String hostName;
     private EyeFiCard card;
@@ -62,6 +64,8 @@ public class EyeFiClient {
         con.setDoInput(true);
         con.setDoOutput(true);
         con.setRequestMethod("POST");
+        con.setRequestProperty("User-agent", "Eye-Fi Card/4.5022");
+        con.setRequestProperty("Host", "api.eye.fi");
         return con;
     }
 
@@ -211,11 +215,12 @@ public class EyeFiClient {
 
     public static void main(String args[]) {
         try {
-            EyeFiConf conf = EyeFiConf.load();
+            URL confURL = EyeFiConfTest.class.getResource("Settings.xml");
+            EyeFiConf conf = EyeFiConf.load(confURL);
             EyeFiCard card = conf.getCards()[0];
             EyeFiClient client = new EyeFiClient("localhost", card);
-            client.startSession();
-            client.getPhotoStatus("P1030007.JPG.tar", 1269760);
+            URL url = TarReaderTest.class.getResource("P1030001.JPG.tar");
+            client.uploadArchive(url);
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error", ex);
         }
