@@ -61,5 +61,3 @@ I have identified three types of media so far:
  * Raw photos (Type 4)
 
 They relate to the Photos, RAW, Video tabs in the Eye-Fi Center application, in the Eye-Fi card settings.
-
-It seems that the Eye-Fi card is handling all files in the same way, and no information about the media type is sent to the server. It's the server that will distinguish between these media types, according either to the file name extension, or the actual content of the file.
