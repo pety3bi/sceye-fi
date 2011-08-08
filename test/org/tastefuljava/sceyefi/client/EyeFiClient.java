@@ -108,11 +108,13 @@ public class EyeFiClient {
                 Bytes.hex2bin(card.getMacAddress()),
                 cnonce,
                 card.getUploadKey());
-        byte[] actualCred = Bytes.hex2bin(resp.getChildText("credential"));
+        String h = resp.getChildText("credential", resp.getNamespace());
+        byte[] actualCred = Bytes.hex2bin(h);
         if (!Bytes.equals(credential, actualCred)) {
             throw new IOException("Invalid credential");
         }
-        snonce = Bytes.hex2bin(resp.getChildText("snonce"));
+        snonce = Bytes.hex2bin(
+                resp.getChildText("snonce", resp.getNamespace()));
     }
 
     public void getPhotoStatus(String archiveName, long size)
@@ -132,7 +134,8 @@ public class EyeFiClient {
         req.addContent(new Element("flags").setText("4"));
         Element resp = simpleAction(req);
         logXML(Level.FINE, resp);
-        fileId = Long.parseLong(resp.getChildText("fileid"));
+        fileId = Long.parseLong(
+                resp.getChildText("fileid", resp.getNamespace()));
     }
 
     public void uploadArchive(InputStream input, String fileName, long size,
@@ -140,6 +143,7 @@ public class EyeFiClient {
         HttpURLConnection con = createConnection(true);
         try {
             String boundary = "aaaaaaaaaaaaazzzzzzzzzz";
+            con.setRequestProperty("SOAPAction", "urn:UploadPhoto");
             con.setRequestProperty("Content-type",
                     "multipart/form-data; boundary=" + boundary);
             OutputStream out = con.getOutputStream();
@@ -154,7 +158,7 @@ public class EyeFiClient {
                 req.addContent(new Element("filesize").setText(
                         Long.toString(size)));
                 req.addContent(new Element("filesignature").setText(
-                        "c8340300c434030000000000dced0300"));
+                        "343afd9e4e84d3d4f5969cd97214f7f2"));
                 req.addContent(new Element("encryption").setText("none"));
                 req.addContent(new Element("flags").setText("4"));
                 out.write(("\r\n--" + boundary + "\r\n").getBytes("ASCII"));
@@ -181,6 +185,11 @@ public class EyeFiClient {
             } finally {
                 out.close();
             }
+            int st = con.getResponseCode();
+            if (st != HttpURLConnection.HTTP_OK) {
+                throw new IOException("Upload failed: " + st + " "
+                        + con.getResponseMessage());
+            }
             InputStream in = con.getInputStream();
             try {
                 SAXBuilder builder = new SAXBuilder();
@@ -188,7 +197,7 @@ public class EyeFiClient {
                 Element resp = SoapEnvelope.strip(doc);
                 logXML(Level.FINE, resp);
                 boolean success = "true".equalsIgnoreCase(
-                        resp.getChildText("success"));
+                        resp.getChildText("success", resp.getNamespace()));
                 if (!success) {
                     throw new IOException("Upload failed");
                 }
@@ -208,13 +217,13 @@ public class EyeFiClient {
         logXML(Level.FINE, resp);
     }
 
-    public void uploadArchive(URL url) throws IOException, JDOMException {
+    public void uploadArchive(URL url, String fileName) throws IOException, JDOMException {
         URLConnection con = url.openConnection();
         InputStream in = con.getInputStream();
         try {
             startSession();
-            getPhotoStatus(url.getFile(), con.getContentLength());
-            uploadArchive(in, url.getFile(), con.getContentLength(),
+            getPhotoStatus(fileName, con.getContentLength());
+            uploadArchive(in, "P1030001.JPG.tar", con.getContentLength(),
                     new Date(con.getLastModified()));
             markLastPhotoInRoll();
         } finally {
@@ -229,7 +238,7 @@ public class EyeFiClient {
             EyeFiCard card = conf.getCards()[0];
             EyeFiClient client = new EyeFiClient("localhost", card);
             URL url = TarReaderTest.class.getResource("P1030001.JPG.tar");
-            client.uploadArchive(url);
+            client.uploadArchive(url, "P1030001.JPG.tar");
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error", ex);
         }
