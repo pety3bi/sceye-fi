@@ -75,7 +75,7 @@ public class DiskFileHandler implements EyeFiHandler {
             }
             do {
                 ++number;
-                file = new File(folder, name + "(" + number + ")");
+                file = new File(folder, name + "(" + number + ")" + ext);
             } while (file.exists());
         }
         return file;
