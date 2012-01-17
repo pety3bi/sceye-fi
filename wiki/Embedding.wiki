@@ -35,7 +35,7 @@ When the server receives a file from an Eye-Fi card, it calls the `startUpload` 
 public UploadHandler startUpload(EyeFiCard card, String archiveName);
 }}}
 
-It passes the `EyeFiCard` object that it had found in the configuration, as well of the name of the archive being received.
+It passes the `EyeFiCard` object that it had found in the configuration, as well as the name of the archive being received.
 
 The method returns an `UploadHandler` that is responsible for storing the uploaded files. The server calls the `handleFile` method for each received file (including the log files), then calls the `commit` method if everything is ok, or the `abort` method if anything went wrong, such as if the integrity check fails.
 
