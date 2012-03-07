@@ -1,2 +1,0 @@
-V0.13:
-    - Issue #4: avoid overwriting files by generating a unique name

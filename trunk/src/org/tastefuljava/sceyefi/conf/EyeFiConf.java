@@ -62,10 +62,6 @@ public class EyeFiConf {
         }
     }
 
-    public EyeFiCard[] getCards() {
-        return cards.values().toArray(new EyeFiCard[cards.size()]);
-    }
-
     public EyeFiCard getCard(String macAddress) {
         return cards.get(macAddress);
     }

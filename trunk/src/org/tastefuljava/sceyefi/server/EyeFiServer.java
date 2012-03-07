@@ -19,6 +19,8 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.InetSocketAddress;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -42,9 +44,7 @@ public class EyeFiServer {
     private static final int EYEFI_PORT = 59278;
     private static final int WORKERS = 2;
     private static final String MAIN_CONTEXT = "/api/soap/eyefilm/v1";
-    private static final String UPLOAD_CONTEXT = "/api/soap/eyefilm/v1/upload";
-    private static final Namespace EYEFI_NAMESPACE = Namespace.getNamespace(
-                    "ns1", "http://localhost/api/soap/eyefilm");
+    public static final String UPLOAD_CONTEXT = "/api/soap/eyefilm/v1/upload";
 
     private byte[] snonce = Bytes.randomBytes(16);
     private String snonceStr = Bytes.bin2hex(snonce);
@@ -90,9 +90,7 @@ public class EyeFiServer {
     }
 
     public void close() {
-        httpServer.removeContext(UPLOAD_CONTEXT);
-        httpServer.removeContext(MAIN_CONTEXT);
-        httpServer.stop(10);
+        httpServer.stop(30);
         executor.shutdownNow();
     }
 
@@ -157,7 +155,9 @@ public class EyeFiServer {
             } finally {
                 in.close();
             }
-            Element resp = new Element("UploadPhotoResponse", EYEFI_NAMESPACE);
+            Namespace eyefiNs = Namespace.getNamespace(
+                    "ns1", "http://localhost/api/soap/eyefilm");
+            Element resp = new Element("UploadPhotoResponse", eyefiNs);
             resp.addContent(new Element("success").setText(
                     success ? "true" : "false"));
             Document response = SoapEnvelope.wrap(resp);
@@ -203,7 +203,6 @@ public class EyeFiServer {
 
     private void processPart(Uploader uploader, Part part, String encoding)
             throws JDOMException, IOException {
-        logHeaders(Level.FINE, part.getHeaders());
         InputStream is = part.getBody();
         try {
             String cd = part.getFirstValue("content-disposition");
@@ -215,8 +214,8 @@ public class EyeFiServer {
                 logXML(Level.FINE, request);
                 Element req = SoapEnvelope.strip(request);
                 uploader.start(
-                        childText(req, "macaddress"),
-                        childText(req, "filename"));
+                        req.getChildText("macaddress"),
+                        req.getChildText("filename"));
             } else if (fieldName.equals("FILENAME")) {
                 uploader.upload(is);
             } else if (fieldName.equals("INTEGRITYDIGEST")) {
@@ -260,20 +259,22 @@ public class EyeFiServer {
 
     private Element startSession(Element req)
             throws JDOMException, IOException {
-        String macAddress = childText(req, "macaddress");
+        String macAddress = req.getChildText("macaddress");
         EyeFiCard card = conf.getCard(macAddress);
         if (card == null) {
             throw new IOException("Card not found " + macAddress);
         }
-        byte[] cnonce = Bytes.hex2bin(childText(req, "cnonce"));
-        String transferModeStr = childText(req, "transfermode");
-        String timestampStr = childText(req, "transfermodetimestamp");
+        byte[] cnonce = Bytes.hex2bin(req.getChildText("cnonce"));
+        String transferModeStr = req.getChildText("transfermode");
+        String timestampStr = req.getChildText("transfermodetimestamp");
 
-        byte[] credential = Bytes.md5(
+        byte[] credential = md5(
                 Bytes.hex2bin(macAddress), cnonce, card.getUploadKey());
         String credentialStr = Bytes.bin2hex(credential);
 
-        Element resp = new Element("StartSessionResponse", EYEFI_NAMESPACE);
+        Namespace eyefiNs = Namespace.getNamespace(
+                "ns1", "http://localhost/api/soap/eyefilm");
+        Element resp = new Element("StartSessionResponse", eyefiNs);
         resp.addContent(new Element("credential").setText(credentialStr));
         resp.addContent(new Element("snonce").setText(snonceStr));
         resp.addContent(
@@ -285,19 +286,21 @@ public class EyeFiServer {
     }
 
     private Element getPhotoStatus(Element req) throws IOException {
-        String macAddress = childText(req, "macaddress");
+        String macAddress = req.getChildText("macaddress");
         EyeFiCard card = conf.getCard(macAddress);
         if (card == null) {
             throw new IOException("Card not found " + macAddress);
         }
-        byte[] credential = Bytes.md5(
+        byte[] credential = md5(
                 Bytes.hex2bin(macAddress), card.getUploadKey(), snonce);
         String expectedCred = Bytes.bin2hex(credential);
-        String actualCred = childText(req, "credential");
+        String actualCred = req.getChildText("credential");
         if (!actualCred.equals(expectedCred)) {
             throw new IOException("Invalid credential send by the card");
         }
-        Element resp = new Element("GetPhotoStatusResponse", EYEFI_NAMESPACE);
+        Namespace eyefiNs = Namespace.getNamespace(
+                "ns1", "http://localhost/api/soap/eyefilm");
+        Element resp = new Element("GetPhotoStatusResponse", eyefiNs);
         int fileId = ++lastFileId;
         resp.addContent(new Element("fileid").setText("" + fileId));
         resp.addContent(new Element("offset").setText("0"));
@@ -305,8 +308,23 @@ public class EyeFiServer {
     }
 
     private Element markLastPhotoInRoll(Element req) {
-        Element resp = new Element("MarkLastPhotoInRollResponse", EYEFI_NAMESPACE);
+        Namespace eyefiNs = Namespace.getNamespace(
+                "ns1", "http://localhost/api/soap/eyefilm");
+        Element resp = new Element("MarkLastPhotoInRollResponse", eyefiNs);
         return resp;
+    }
+
+    private static byte[] md5(byte[]... args) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            for (byte[] arg : args) {
+                digest.update(arg);
+            }
+            return digest.digest();
+        } catch (NoSuchAlgorithmException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex.getMessage());
+        }
     }
 
     private static void writeXML(Document doc, OutputStream out,
@@ -329,14 +347,6 @@ public class EyeFiServer {
                 out.close();
             }
         }
-    }
-
-    private static String childText(Element elm, String name) {
-        String s = elm.getChildText(name);
-        if (s != null) {
-            return s;
-        }
-        return elm.getChildText(name, elm.getNamespace());
     }
 
     private static void logHeaders(Level level,
