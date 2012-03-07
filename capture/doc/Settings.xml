@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<Config version="2.0">
+    <ShowThumbnailPreview>true</ShowThumbnailPreview>
+    <MIB>
+        <ReceivedCounter>0</ReceivedCounter>
+    </MIB>
+    <Cards>
+        <Card MacAddress="00-18-56-41-77-29">
+            <UploadKey>0d6ec517a597ec130b64e77c9b57f40e</UploadKey>
+            <DownsyncKey>693db4cdaa431bb3b1132dfe89c60755</DownsyncKey>
+            <TransferMode>2</TransferMode>
+            <TransferModeTimestamp>1304088542</TransferModeTimestamp>
+            <MediaTypes>
+                <Media Type="1">
+                    <Folder>/Users/maurice/Pictures/Eye-Fi</Folder>
+                    <AddDate>1</AddDate>
+                    <DateType>1</DateType>
+                    <CustomDateFormat></CustomDateFormat>
+                </Media>
+                <Media Type="2">
+                    <Folder>/Users/maurice/Movies/Eye-Fi</Folder>
+                    <AddDate>1</AddDate>
+                    <DateType>0</DateType>
+                    <CustomDateFormat></CustomDateFormat>
+                </Media>
+                <Media Type="4">
+                    <Folder>/Users/maurice/Pictures/Eye-Fi/Raw</Folder>
+                    <AddDate>1</AddDate>
+                    <DateType>1</DateType>
+                    <CustomDateFormat></CustomDateFormat>
+                </Media>
+            </MediaTypes>
+        </Card>
+    </Cards>
+</Config>
