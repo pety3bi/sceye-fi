@@ -22,7 +22,7 @@ public class Main {
             } else {
                 conf = EyeFiConf.load(settings);
             }
-            EyeFiServer.start(conf, new DiskFileHandler());
+            EyeFiServer.start(conf);
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }

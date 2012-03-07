@@ -10,7 +10,7 @@
 <project name="sceye-fi" default="default" basedir=".">
     <description>Builds, tests, and runs the project sceye-fi.</description>
     <import file="nbproject/build-impl.xml"/>
-    <property name="sceye-fi-version" value="0.13"/>
+    <property name="sceye-fi-version" value="0.11"/>
 
     <!--
 
@@ -78,10 +78,6 @@
             <zipfileset dir="dist" prefix="sceye-fi-${sceye-fi-version}">
                 <include name="sceye-fi.jar"/>
                 <include name="lib/**"/>
-            </zipfileset>
-            <zipfileset dir="." prefix="sceye-fi-${sceye-fi-version}">
-                <include name="LICENSE.txt"/>
-                <include name="changes.txt"/>
             </zipfileset>
         </zip>
     </target>
