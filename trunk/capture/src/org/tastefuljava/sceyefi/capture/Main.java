@@ -15,11 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.tastefuljava.sceyefi;
+package org.tastefuljava.sceyefi.capture;
 
 import java.io.File;
-import org.tastefuljava.sceyefi.conf.EyeFiConf;
-import org.tastefuljava.sceyefi.server.EyeFiServer;
+import org.tastefuljava.sceyefi.capture.conf.EyeFiConf;
+import org.tastefuljava.sceyefi.capture.server.EyeFiServer;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;

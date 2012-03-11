@@ -1,5 +1,6 @@
 package org.tastefuljava.sceyefi.multipart;
 
+import org.tastefuljava.sceyefi.capture.multipart.ValueParser;
 import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.*;

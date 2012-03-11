@@ -1,5 +1,6 @@
 package org.tastefuljava.sceyefi.util;
 
+import org.tastefuljava.sceyefi.capture.util.Bytes;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

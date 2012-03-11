@@ -17,14 +17,14 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.tastefuljava.sceyefi.conf.EyeFiCard;
-import org.tastefuljava.sceyefi.conf.EyeFiConf;
+import org.tastefuljava.sceyefi.capture.conf.EyeFiCard;
+import org.tastefuljava.sceyefi.capture.conf.EyeFiConf;
 import org.tastefuljava.sceyefi.conf.EyeFiConfTest;
-import org.tastefuljava.sceyefi.server.ChecksumInputStream;
-import org.tastefuljava.sceyefi.server.SoapEnvelope;
+import org.tastefuljava.sceyefi.capture.server.ChecksumInputStream;
+import org.tastefuljava.sceyefi.capture.server.SoapEnvelope;
 import org.tastefuljava.sceyefi.tar.TarReaderTest;
-import org.tastefuljava.sceyefi.util.Bytes;
-import org.tastefuljava.sceyefi.util.LogWriter;
+import org.tastefuljava.sceyefi.capture.util.Bytes;
+import org.tastefuljava.sceyefi.capture.util.LogWriter;
 
 public class EyeFiClient {
     private static final Logger LOG

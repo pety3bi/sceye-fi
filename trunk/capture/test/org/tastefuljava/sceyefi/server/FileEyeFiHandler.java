@@ -10,9 +10,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.tastefuljava.sceyefi.conf.EyeFiCard;
-import org.tastefuljava.sceyefi.spi.EyeFiHandler;
-import org.tastefuljava.sceyefi.spi.UploadHandler;
+import org.tastefuljava.sceyefi.capture.conf.EyeFiCard;
+import org.tastefuljava.sceyefi.capture.spi.EyeFiHandler;
+import org.tastefuljava.sceyefi.capture.spi.UploadHandler;
 
 public class FileEyeFiHandler implements EyeFiHandler {
     private static final Pattern NUMBERED_PATTERN

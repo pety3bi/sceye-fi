@@ -1,5 +1,7 @@
 package org.tastefuljava.sceyefi.multipart;
 
+import org.tastefuljava.sceyefi.capture.multipart.Multipart;
+import org.tastefuljava.sceyefi.capture.multipart.Part;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

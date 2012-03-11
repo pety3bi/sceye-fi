@@ -1,5 +1,6 @@
 package org.tastefuljava.sceyefi.multipart;
 
+import org.tastefuljava.sceyefi.capture.multipart.HeaderParser;
 import java.util.Map;
 import java.util.List;
 import java.io.IOException;
