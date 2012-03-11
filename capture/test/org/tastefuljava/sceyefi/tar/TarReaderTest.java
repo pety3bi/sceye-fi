@@ -1,5 +1,7 @@
 package org.tastefuljava.sceyefi.tar;
 
+import org.tastefuljava.sceyefi.capture.tar.TarEntry;
+import org.tastefuljava.sceyefi.capture.tar.TarReader;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.After;

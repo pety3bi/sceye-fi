@@ -15,9 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.tastefuljava.sceyefi;
+package org.tastefuljava.sceyefi.capture;
 
-import org.tastefuljava.sceyefi.spi.UploadHandler;
+import org.tastefuljava.sceyefi.capture.spi.UploadHandler;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,9 +28,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.tastefuljava.sceyefi.conf.EyeFiCard;
-import org.tastefuljava.sceyefi.conf.Media;
-import org.tastefuljava.sceyefi.spi.EyeFiHandler;
+import org.tastefuljava.sceyefi.capture.conf.EyeFiCard;
+import org.tastefuljava.sceyefi.capture.conf.Media;
+import org.tastefuljava.sceyefi.capture.spi.EyeFiHandler;
 
 public class DiskFileHandler implements EyeFiHandler {
     private static final int BUFFER_SIZE = 4096;

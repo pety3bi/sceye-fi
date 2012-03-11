@@ -1,6 +1,9 @@
 package org.tastefuljava.sceyefi.conf;
 
-import org.tastefuljava.sceyefi.util.Bytes;
+import org.tastefuljava.sceyefi.capture.conf.EyeFiConf;
+import org.tastefuljava.sceyefi.capture.conf.EyeFiCard;
+import org.tastefuljava.sceyefi.capture.conf.Media;
+import org.tastefuljava.sceyefi.capture.util.Bytes;
 import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;

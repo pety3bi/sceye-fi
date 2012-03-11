@@ -1,5 +1,6 @@
 package org.tastefuljava.sceyefi.server;
 
+import org.tastefuljava.sceyefi.capture.server.EyeFiServer;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -10,7 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.tastefuljava.sceyefi.client.EyeFiClient;
-import org.tastefuljava.sceyefi.conf.EyeFiConf;
+import org.tastefuljava.sceyefi.capture.conf.EyeFiConf;
 import org.tastefuljava.sceyefi.conf.EyeFiConfTest;
 import org.tastefuljava.sceyefi.tar.TarReaderTest;
 
