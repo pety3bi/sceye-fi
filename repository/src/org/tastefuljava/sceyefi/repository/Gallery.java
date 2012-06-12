@@ -13,21 +13,21 @@ public class Gallery extends NamedObject {
     private Dimension basePreviewSize = new Dimension(1280, 1280);
     private List<Dimension> previewSizes = new ArrayList<Dimension>();
 
-    public Map<String,Tag> getTags() {
+    public Map<String,Tag> getOwnTags() {
         return new HashMap<String,Tag>(tags);
     }
 
-    public Map<String,Tag> getAllTags() {
+    public Map<String,Tag> getTags() {
         Map<String,Tag> result = new HashMap<String,Tag>();
         addTagsTo(result);
         return result;
     }
 
-    public Map<String,Picture> getPictures() {
+    public Map<String,Picture> getOwnPictures() {
         return new HashMap<String,Picture>(pics);
     }
 
-    public Map<String,Picture> getAllPictures() {
+    public Map<String,Picture> getPictures() {
         Map<String,Picture> result = new HashMap<String,Picture>();
         addPicsTo(result);
         return result;
