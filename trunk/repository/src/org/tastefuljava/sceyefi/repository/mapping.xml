@@ -41,7 +41,7 @@
             <map-key column="LANGUAGE" length="2" type="string"/>
             <element column="TEXT" type="text"/>
         </map>
-        <set lazy="true" name="tags" table="pictures_tags">
+        <set cascade="all" lazy="true" name="tags" table="pictures_tags">
             <key column="PICTURE_ID"/>
             <many-to-many class="Tag" column="TAG_ID"/>
         </set>

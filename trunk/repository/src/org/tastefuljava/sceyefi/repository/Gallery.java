@@ -6,7 +6,7 @@ import java.util.Map;
 public class Gallery extends NamedObject {
     private Gallery model;
     private Map<String,Tag> tags = new HashMap<String,Tag>();
-    private Map<String,Picture> pics = new HashMap<String,Picture>();
+    private Map<String,Picture> pictures = new HashMap<String,Picture>();
 
     public Map<String,Tag> getOwnTags() {
         return new HashMap<String,Tag>(tags);
@@ -19,7 +19,7 @@ public class Gallery extends NamedObject {
     }
 
     public Map<String,Picture> getOwnPictures() {
-        return new HashMap<String,Picture>(pics);
+        return new HashMap<String,Picture>(pictures);
     }
 
     public Map<String,Picture> getPictures() {
@@ -39,6 +39,6 @@ public class Gallery extends NamedObject {
         if (model != null) {
             model.addPicsTo(result);
         }
-        result.putAll(pics);
+        result.putAll(pictures);
     }
 }
