@@ -71,4 +71,20 @@
     nbproject/build-impl.xml file. 
 
     -->
+
+    <target name="schema">
+        <taskdef name="schemaexport"
+                classname="org.hibernate.tool.hbm2ddl.SchemaExportTask">
+            <classpath>
+                <pathelement location="build/classes"/>
+                <fileset dir="lib" includes="**/*.jar"/>
+            </classpath>
+        </taskdef>
+        <schemaexport text="true" drop="false" create="true" delimiter=";"
+                config="src/org/tastefuljava/sceyefi/repository/hibernate.xml"
+                output="${basedir}/build/schema.sql">
+        </schemaexport>
+    </target>
+
+    <target name="-post-compile" depends="schema"/>
 </project>

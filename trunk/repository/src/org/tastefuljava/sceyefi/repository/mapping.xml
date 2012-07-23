@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-access="field"
+        package="org.tastefuljava.sceyefi.repository">
+    <class name="Gallery" table="galleries">
+        <id name="id" column="ID">
+            <generator class="native"/>
+        </id>
+        <property column="CODE" length="32" name="code" unique="true"/>
+        <map cascade="all-delete-orphan" name="titles" table="galleries_titles">
+            <key column="GALLERY_ID"/>
+            <map-key column="LANGUAGE" length="2" type="string"/>
+            <element column="TEXT" length="255" type="string"/>
+        </map>
+        <map cascade="all-delete-orphan" name="descriptions"
+                table="galleries_descriptions">
+            <key column="GALLERY_ID"/>
+            <map-key column="LANGUAGE" length="2" type="string"/>
+            <element column="TEXT" type="text"/>
+        </map>
+        <map cascade="all-delete-orphan" lazy="true" name="pictures">
+            <key column="GALLERY_ID" not-null="true"/>
+            <map-key column="CODE" length="32" type="string"/>
+            <one-to-many class="Picture"/>
+        </map>
+    </class>
+    <class name="Picture" table="pictures">
+        <id name="id" column="ID">
+            <generator class="native"/>
+        </id>
+        <property column="CODE" length="32" name="code"/>
+        <map cascade="all-delete-orphan" name="titles" table="pictures_titles">
+            <key column="PICTURE_ID"/>
+            <map-key column="LANGUAGE" length="2" type="string"/>
+            <element column="TEXT" length="255" type="string"/>
+        </map>
+        <map cascade="all-delete-orphan" name="descriptions"
+                table="pictures_descriptions">
+            <key column="PICTURE_ID"/>
+            <map-key column="LANGUAGE" length="2" type="string"/>
+            <element column="TEXT" type="text"/>
+        </map>
+        <set lazy="true" name="tags" table="pictures_tags">
+            <key column="PICTURE_ID"/>
+            <many-to-many class="Tag" column="TAG_ID"/>
+        </set>
+    </class>
+    <class name="Tag" table="tags">
+        <id name="id" column="ID">
+            <generator class="native"/>
+        </id>
+        <property column="CODE" length="32" name="code" unique="true"/>
+        <map cascade="all-delete-orphan" name="titles" table="tags_titles">
+            <key column="TAG_ID"/>
+            <map-key column="LANGUAGE" length="2" type="string"/>
+            <element column="TEXT" length="255" type="string"/>
+        </map>
+        <map cascade="all-delete-orphan" name="descriptions"
+                table="tags_descriptions">
+            <key column="TAG_ID"/>
+            <map-key column="LANGUAGE" length="2" type="string"/>
+            <element column="TEXT" type="text"/>
+        </map>
+    </class>
+</hibernate-mapping>
