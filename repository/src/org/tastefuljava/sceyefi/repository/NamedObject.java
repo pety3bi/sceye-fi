@@ -3,7 +3,8 @@ package org.tastefuljava.sceyefi.repository;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NamedObject {
+public abstract class NamedObject {
+    private int id;
     private String code;
     private Map<String,String> titles = new HashMap<String,String>();
     private Map<String,String> descriptions = new HashMap<String,String>();
