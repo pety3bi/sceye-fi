@@ -17,13 +17,13 @@
  */
 package org.tastefuljava.sceyefi.capture.conf;
 
-import org.tastefuljava.sceyefi.capture.util.Bytes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.jdom.Element;
+import org.tastefuljava.sceyefi.capture.util.Bytes;
 
 public class EyeFiCard {
     private String macAddress;

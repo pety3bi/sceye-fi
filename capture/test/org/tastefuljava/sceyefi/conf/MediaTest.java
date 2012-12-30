@@ -1,13 +1,13 @@
 package org.tastefuljava.sceyefi.conf;
 
-import org.tastefuljava.sceyefi.capture.conf.EyeFiConf;
-import org.tastefuljava.sceyefi.capture.conf.EyeFiCard;
-import org.tastefuljava.sceyefi.capture.conf.Media;
 import java.io.File;
 import java.io.IOException;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import org.tastefuljava.sceyefi.capture.conf.EyeFiCard;
+import org.tastefuljava.sceyefi.capture.conf.EyeFiConf;
+import org.tastefuljava.sceyefi.capture.conf.Media;
 
 public class MediaTest {
     private Media media;

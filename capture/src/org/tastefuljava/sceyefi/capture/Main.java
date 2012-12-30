@@ -18,11 +18,11 @@
 package org.tastefuljava.sceyefi.capture;
 
 import java.io.File;
-import org.tastefuljava.sceyefi.capture.conf.EyeFiConf;
-import org.tastefuljava.sceyefi.capture.server.EyeFiServer;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.tastefuljava.sceyefi.capture.conf.EyeFiConf;
+import org.tastefuljava.sceyefi.capture.server.EyeFiServer;
 
 public class Main {
     private static File settings = null;
