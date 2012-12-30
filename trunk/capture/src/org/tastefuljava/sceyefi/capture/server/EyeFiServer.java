@@ -22,12 +22,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import java.io.BufferedReader;
-import org.tastefuljava.sceyefi.capture.conf.EyeFiCard;
-import org.tastefuljava.sceyefi.capture.conf.EyeFiConf;
-import org.tastefuljava.sceyefi.capture.multipart.Multipart;
-import org.tastefuljava.sceyefi.capture.multipart.Part;
-import org.tastefuljava.sceyefi.capture.multipart.ValueParser;
-import org.tastefuljava.sceyefi.capture.util.Bytes;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +43,13 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.tastefuljava.sceyefi.capture.conf.EyeFiCard;
+import org.tastefuljava.sceyefi.capture.conf.EyeFiConf;
+import org.tastefuljava.sceyefi.capture.multipart.Multipart;
+import org.tastefuljava.sceyefi.capture.multipart.Part;
+import org.tastefuljava.sceyefi.capture.multipart.ValueParser;
 import org.tastefuljava.sceyefi.capture.spi.EyeFiHandler;
+import org.tastefuljava.sceyefi.capture.util.Bytes;
 import org.tastefuljava.sceyefi.capture.util.LogWriter;
 
 public class EyeFiServer {

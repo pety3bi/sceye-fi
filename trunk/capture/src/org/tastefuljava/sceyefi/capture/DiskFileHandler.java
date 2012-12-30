@@ -17,7 +17,6 @@
  */
 package org.tastefuljava.sceyefi.capture;
 
-import org.tastefuljava.sceyefi.capture.spi.UploadHandler;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,6 +30,7 @@ import java.util.regex.Pattern;
 import org.tastefuljava.sceyefi.capture.conf.EyeFiCard;
 import org.tastefuljava.sceyefi.capture.conf.Media;
 import org.tastefuljava.sceyefi.capture.spi.EyeFiHandler;
+import org.tastefuljava.sceyefi.capture.spi.UploadHandler;
 
 public class DiskFileHandler implements EyeFiHandler {
     private static final int BUFFER_SIZE = 4096;
@@ -74,7 +74,6 @@ public class DiskFileHandler implements EyeFiHandler {
             public void commit() {
                 files.clear();
             }
-
         };
     }
 
