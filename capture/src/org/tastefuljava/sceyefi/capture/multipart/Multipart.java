@@ -28,10 +28,10 @@ public class Multipart {
     private static final byte HYPHEN = '-';
     private static final byte[] PREFIX = {CR, LF, HYPHEN, HYPHEN};
 
-    private InputStream in;
-    private String encoding;
-    private byte[] boundary;
-    private byte[] buffer = new byte[256];
+    private final InputStream in;
+    private final String encoding;
+    private final byte[] boundary;
+    private final byte[] buffer = new byte[256];
     private int head;
     private int tail;
     private boolean eos;

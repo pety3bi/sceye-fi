@@ -26,12 +26,13 @@ import org.jdom.Element;
 import org.tastefuljava.sceyefi.capture.util.Bytes;
 
 public class EyeFiCard {
-    private String macAddress;
-    private byte[] uploadKey;
-    private byte[] downsyncKey;
-    private int transferMode;
-    private long timestamp;
-    private Map<Integer,Media> mediaTypes = new LinkedHashMap<Integer,Media>();
+    private final String macAddress;
+    private final byte[] uploadKey;
+    private final byte[] downsyncKey;
+    private final int transferMode;
+    private final long timestamp;
+    private final Map<Integer,Media> mediaTypes
+            = new LinkedHashMap<Integer,Media>();
 
     EyeFiCard(Element cardElm) {
         String mac = cardElm.getAttributeValue("MacAddress");

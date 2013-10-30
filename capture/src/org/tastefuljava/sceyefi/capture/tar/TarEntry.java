@@ -21,10 +21,10 @@ import java.io.InputStream;
 import java.util.Date;
 
 public class TarEntry {
-    private String fileName;
-    private Date lastModified;
-    private long length;
-    private InputStream in;
+    private final String fileName;
+    private final Date lastModified;
+    private final long length;
+    private final InputStream in;
 
     TarEntry(String fileName, Date lastModified, long length, InputStream in) {
         this.fileName = fileName;
