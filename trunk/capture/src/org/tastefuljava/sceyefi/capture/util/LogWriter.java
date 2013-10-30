@@ -23,9 +23,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LogWriter extends Writer {
-    private Logger log;
-    private Level level;
-    private StringBuilder buf = new StringBuilder();
+    @SuppressWarnings("NonConstantLogger")
+    private final Logger log;
+    private final Level level;
+    private final StringBuilder buf = new StringBuilder();
 
     public LogWriter(Logger log, Level level) {
         this.log = log;

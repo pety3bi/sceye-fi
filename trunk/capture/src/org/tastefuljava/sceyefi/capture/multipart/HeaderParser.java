@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Map;
 
 public class HeaderParser {
-    private InputStream in;
-    private String encoding;
-    private Map<String,List<String>> headers
+    private final InputStream in;
+    private final String encoding;
+    private final Map<String,List<String>> headers
             = new LinkedHashMap<String,List<String>>();
     private int c;
 

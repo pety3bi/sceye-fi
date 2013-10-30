@@ -25,8 +25,8 @@ import java.util.Date;
 public class TarReader {
     private static final int BLOCK_SIZE = 512;
 
-    private InputStream in;
-    private byte[] buffer = new byte[BLOCK_SIZE];
+    private final InputStream in;
+    private final byte[] buffer = new byte[BLOCK_SIZE];
 
     public TarReader(InputStream in) throws IOException {
         this.in = in;

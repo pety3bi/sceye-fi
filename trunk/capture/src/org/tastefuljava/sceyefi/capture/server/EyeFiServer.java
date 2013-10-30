@@ -63,13 +63,13 @@ public class EyeFiServer {
     private static final Namespace EYEFI_NAMESPACE = Namespace.getNamespace(
                     "ns1", "http://localhost/api/soap/eyefilm");
 
-    private byte[] snonce = Bytes.randomBytes(16);
-    private String snonceStr = Bytes.bin2hex(snonce);
-    private EyeFiConf conf;
-    private ExecutorService executor;
-    private HttpServer httpServer;
+    private final byte[] snonce = Bytes.randomBytes(16);
+    private final String snonceStr = Bytes.bin2hex(snonce);
+    private final EyeFiConf conf;
+    private final ExecutorService executor;
+    private final HttpServer httpServer;
+    private final EyeFiHandler handler;
     private int lastFileId;
-    private EyeFiHandler handler;
 
     public static EyeFiServer start(EyeFiConf conf, EyeFiHandler handler)
             throws IOException {

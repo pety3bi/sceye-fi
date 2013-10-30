@@ -31,7 +31,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 public class EyeFiConf {
-    private Map<String,EyeFiCard> cards = new HashMap<String,EyeFiCard>();
+    private final Map<String,EyeFiCard> cards = new HashMap<String,EyeFiCard>();
 
     public static EyeFiConf load() throws IOException {
         File homeDir = new File(System.getProperty("user.home"));

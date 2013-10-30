@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Part {
-    private Map<String,List<String>> headers;
-    private InputStream body;
+    private final Map<String,List<String>> headers;
+    private final InputStream body;
 
     Part(Map<String,List<String>> headers, InputStream body) {
         this.headers = headers;

@@ -31,11 +31,11 @@ public class Media {
     public static final int DATE_UPLOAD = 0;
     public static final int DATE_CREATED = 1;
 
-    private int type;
-    private File folder;
-    private boolean addDate;
-    private int dateType;
-    private String customDateFormat;
+    private final int type;
+    private final File folder;
+    private final boolean addDate;
+    private final int dateType;
+    private final String customDateFormat;
 
     Media(Element elm) {
         type = Integer.parseInt(elm.getAttributeValue("Type"));

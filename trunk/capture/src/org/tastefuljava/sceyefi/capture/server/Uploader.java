@@ -36,8 +36,8 @@ class Uploader {
     private static final Logger LOG
             = Logger.getLogger(Uploader.class.getName());
 
-    private EyeFiConf conf;
-    private EyeFiHandler handler;
+    private final EyeFiConf conf;
+    private final EyeFiHandler handler;
     private EyeFiCard card;
     private UploadHandler upload;
     private boolean failed;
